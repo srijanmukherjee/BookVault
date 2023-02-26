@@ -1,15 +1,17 @@
 version: '3'
 
 services:
-  # api_server:
-  #   build: 
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "8080:80"
-  #   # volumes:
-  #   depends_on:
-  #     - database
+  api_server:
+    build: 
+      context: server
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8000"
+    volumes:
+      - ./server:/app
+      - ./server/node_modules:/app/node_modules
+    depends_on:
+      - database
   
   frontend_server:
     image: react_test_server
