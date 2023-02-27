@@ -1,7 +1,15 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 import Header from "../components/Header";
-import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
+import {
+	Box,
+	CssBaseline,
+	ThemeProvider,
+	Typography,
+	createTheme,
+} from "@mui/material";
+import { Route, Routes } from "react-router-dom";
+import Catalog from "../../features/catalog/Catalog";
 
 const THEME_KEY = "theme";
 
@@ -27,6 +35,19 @@ function App() {
 				theme={theme.palette.mode}
 				onThemeToggle={() => setDarkTheme((theme) => !theme)}
 			/>
+			<Box>
+				<Routes>
+					<Route
+						path="/"
+						element={
+							<Typography height="1000vh" variant="h1">
+								Home page
+							</Typography>
+						}
+					/>
+					<Route path="/catalog" element={<Catalog />} />
+				</Routes>
+			</Box>
 		</ThemeProvider>
 	);
 }

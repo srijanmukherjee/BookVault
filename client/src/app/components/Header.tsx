@@ -9,6 +9,7 @@ import {
 import AdbIcon from "@mui/icons-material/Adb";
 import ThemeToggleButton from "./ThemeToggleButton";
 import Search from "./Search";
+import { Link } from "react-router-dom";
 
 const links = [{ label: "Browse", to: "/catalog" }];
 
@@ -46,7 +47,6 @@ export default function Header({ theme, onThemeToggle }: Props) {
 						justifyContent="flex-end"
 						alignItems="center">
 						<Search />
-
 						<Box
 							sx={{
 								display: { xs: "none", md: "flex" },
@@ -59,12 +59,13 @@ export default function Header({ theme, onThemeToggle }: Props) {
 										my: 2,
 										color: "white",
 										display: "block",
-									}}>
+									}}
+									component={Link}
+									to={to}>
 									{label}
 								</Button>
 							))}
 						</Box>
-
 						<Box display={{ xs: "none", md: "flex" }}>
 							<Button
 								sx={{
