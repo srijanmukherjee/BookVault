@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import CatalogHeader from "./CatalogHeader";
 import CatalogList from "./CatalogList";
 import CatalogListControl from "./CatalogListControl";
+import CatalogFilters from "./filters/CatalogFilters";
 
 const productsUrl = "https://dummyjson.com/products";
 
@@ -43,11 +44,11 @@ export default function Catalog() {
 		<>
 			<CatalogHeader />
 			<Container maxWidth="xl">
-				<Grid container>
-					<Grid item md={2} py={10}>
-						Side bar
+				<Grid container my={2} columnSpacing={4}>
+					<Grid item md={2}>
+						<CatalogFilters />
 					</Grid>
-					<Grid item md={10} py={2}>
+					<Grid item md={10}>
 						{/* TODO: Decide what to do with CatalogListControl */}
 						{/* <CatalogListControl /> */}
 						<CatalogList products={products} />

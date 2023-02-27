@@ -33,7 +33,7 @@ export default function CatalogList({ products }: Props) {
 								key={index}
 							/>{" "}
 							{index < products.length - 1 && (
-								<Divider variant="inset" component="li" />
+								<Divider variant="fullWidth" component="li" />
 							)}
 						</>
 					);
