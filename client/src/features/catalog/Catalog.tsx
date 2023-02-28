@@ -9,7 +9,6 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import CatalogHeader from "./CatalogHeader";
 import CatalogList from "./CatalogList";
-import CatalogListControl from "./CatalogListControl";
 import CatalogFilters from "./filters/CatalogFilters";
 
 const productsUrl = "https://dummyjson.com/products";

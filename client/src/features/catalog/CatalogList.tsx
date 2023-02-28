@@ -1,15 +1,5 @@
-import {
-	Avatar,
-	Divider,
-	List,
-	ListItem,
-	ListItemAvatar,
-	ListItemText,
-	Typography,
-} from "@mui/material";
-import React from "react";
+import { Divider, List, Typography } from "@mui/material";
 import CatalogListItem from "./CatalogListItem";
-import SortFilters from "./filters/SortFilters";
 
 interface Props {
 	products: any[];

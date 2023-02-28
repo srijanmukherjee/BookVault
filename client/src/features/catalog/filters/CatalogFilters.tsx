@@ -1,19 +1,13 @@
-import { ExpandLess, ExpandMore, StarBorder } from "@mui/icons-material";
 import {
 	Box,
 	Checkbox,
-	Collapse,
 	FormControlLabel,
 	FormGroup,
 	List,
-	ListItemButton,
-	ListItemIcon,
-	ListItemText,
 	Paper,
 	Rating,
 	Typography,
 } from "@mui/material";
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import CollapsableFilter from "./CollapsableFilter";
 
