@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import React from "react";
 import CatalogListItem from "./CatalogListItem";
+import SortFilters from "./filters/SortFilters";
 
 interface Props {
 	products: any[];
