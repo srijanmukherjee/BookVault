@@ -5,6 +5,7 @@ import {
 	Typography,
 	Collapse,
 	Box,
+	CircularProgress,
 } from "@mui/material";
 import { PropsWithChildren, useState } from "react";
 
@@ -12,6 +13,7 @@ interface Props extends PropsWithChildren {
 	collapsed?: boolean;
 	label: string;
 	disableBottomGutter?: boolean;
+	loading?: boolean;
 }
 
 export default function CollapsableFilter({
@@ -19,6 +21,7 @@ export default function CollapsableFilter({
 	collapsed,
 	children,
 	disableBottomGutter = false,
+	loading = false,
 }: Props) {
 	const [open, setOpen] = useState(collapsed !== true);
 	return (
@@ -29,15 +32,24 @@ export default function CollapsableFilter({
 				</ListItemText>
 				{open ? <ExpandLess /> : <ExpandMore />}
 			</ListItemButton>
-			<Collapse
-				in={open}
-				timeout="auto"
-				unmountOnExit
-				sx={{ mb: disableBottomGutter ? 0 : 2 }}>
-				<Box display="flex" flexDirection="column" px={2}>
-					{children}
+
+			{loading && (
+				<Box display="flex" justifyContent="center" my={2}>
+					<CircularProgress size={24} color="primary" />
 				</Box>
-			</Collapse>
+			)}
+
+			{!loading && (
+				<Collapse
+					in={open}
+					timeout="auto"
+					unmountOnExit
+					sx={{ mb: disableBottomGutter ? 0 : 2 }}>
+					<Box display="flex" flexDirection="column" px={2}>
+						{children}
+					</Box>
+				</Collapse>
+			)}
 		</>
 	);
 }

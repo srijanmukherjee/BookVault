@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { ObjectType, Field, Resolver, Query, ID } from 'type-graphql';
+import { ObjectType, Field, Resolver, Query, ID, Args, ArgsType, Arg } from 'type-graphql';
 import { client } from '../db';
 import { Book } from './Book.model';
 
@@ -11,7 +11,7 @@ export class Category {
     @Field()
     name: string
 
-    @Field(type => [Book])
+    @Field(type => [Book], { nullable: true })
     books: Book[]
 }
 
@@ -19,6 +19,14 @@ export class Category {
 export class CategoryResolver {
     @Query((returns) => [Category], { nullable: true })
     async categories() {
-        return client.category.findMany()
+        return client.category.findMany({
+            ...this.buildQuery()
+        })
+    }
+
+    buildQuery() {
+        const query: any = {};
+
+        return query;
     }
 }

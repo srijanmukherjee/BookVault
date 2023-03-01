@@ -13,12 +13,11 @@ import {
 import { Link } from "react-router-dom";
 import CollapsableFilter from "./CollapsableFilter";
 import { useState } from "react";
+import { useAppSelector } from "../../../app/store";
 
 const CATEGORY_COUNT = 20;
 
-interface Props {
-	categories: { id: number; name: string }[];
-}
+interface Props {}
 
 function renderCategory(category: { id: number; name: string }, index: number) {
 	return (
@@ -40,13 +39,17 @@ function renderCategory(category: { id: number; name: string }, index: number) {
 	);
 }
 
-export default function CatalogFilters({ categories }: Props) {
+export default function CatalogFilters({}: Props) {
 	const [categoriesMore, setCategoriesMore] = useState(false);
+	const { filters } = useAppSelector((state) => state.catalog);
+	const { data: categories, state } = filters.categories;
 
 	return (
 		<Box component={Paper} elevation={2}>
 			<List aria-labelledby="filters-list">
-				<CollapsableFilter label="Category">
+				<CollapsableFilter
+					label="Category"
+					loading={state === "loading"}>
 					{categories.slice(0, CATEGORY_COUNT).map(renderCategory)}
 					<Collapse in={categoriesMore} timeout="auto" unmountOnExit>
 						<Box sx={{ display: "flex", flexDirection: "column" }}>

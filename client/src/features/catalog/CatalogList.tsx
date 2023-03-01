@@ -1,12 +1,34 @@
-import { Divider, List, Typography } from "@mui/material";
+import {
+	Box,
+	CircularProgress,
+	Divider,
+	List,
+	Typography,
+} from "@mui/material";
 import CatalogListItem from "./CatalogListItem";
 import { Fragment } from "react";
+import { useAppSelector } from "../../app/store";
+import { productSelectors } from "./catalogSlice";
 
-interface Props {
-	products: any[];
-}
+export default function CatalogList() {
+	const products = useAppSelector((state) =>
+		productSelectors.selectAll(state)
+	);
+	const { status } = useAppSelector((state) => state.catalog);
 
-export default function CatalogList({ products }: Props) {
+	if (status === "products-loading") {
+		return (
+			<Box
+				display="grid"
+				sx={{
+					placeItems: "center",
+					height: "100%",
+				}}>
+				<CircularProgress size={32} color="primary" />
+			</Box>
+		);
+	}
+
 	return (
 		<>
 			<Typography variant="h5" sx={{ textTransform: "uppercase" }}>
@@ -17,7 +39,7 @@ export default function CatalogList({ products }: Props) {
 					width: "100%",
 					bgcolor: "background.paper",
 				}}>
-				{products.slice(0, 16).map((product, index) => {
+				{products.map((product, index) => {
 					return (
 						<Fragment key={index}>
 							<CatalogListItem
