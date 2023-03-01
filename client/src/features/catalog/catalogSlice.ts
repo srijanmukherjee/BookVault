@@ -1,9 +1,10 @@
 import { createAsyncThunk, createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 import { Category } from "../../app/models/filters";
-import { client, requests } from "../../app/api/agent";
+import { SearchParams, client, requests } from "../../app/api/agent";
 import { Product } from "../../app/models/product";
 import { PaginatedProductSchema } from "../../app/api/schema";
 import { RootState } from "../../app/store";
+import _ from "lodash";
 
 interface CategoryFilter {
     data: Category[];
@@ -17,7 +18,6 @@ interface Pagination {
     itemCount: number;
     itemsPerPage: number;
 }
-
 interface CatalogState {
     filters: {
         categories: CategoryFilter
@@ -26,6 +26,7 @@ interface CatalogState {
     status: 'idle' | 'loading' | 'products-loading';
     loaded: boolean;
     pagination: Pagination;
+    productParams: SearchParams;
 }
 
 const initialState: CatalogState = {
@@ -43,6 +44,10 @@ const initialState: CatalogState = {
         currentPage: -1,
         itemCount: 0,
         totalPages: 0,
+        itemsPerPage: 20
+    },
+    productParams: {
+        page: 1,
         itemsPerPage: 20
     }
 }
@@ -72,7 +77,8 @@ export const fetchProducts = createAsyncThunk<PaginatedProductSchema, void, { st
     'catalog/fetchProducts',
     async (_, thunkAPI) => {
         try {
-            const { data } = await requests.catalog.fetchProducts();
+            const { catalog } = thunkAPI.getState()
+            const { data } = await requests.catalog.fetchProducts(catalog.productParams);
             return data;
         } catch (error: any) {
             return thunkAPI.rejectWithValue({ error: error.toString() });
@@ -89,7 +95,16 @@ export const fetchProducts = createAsyncThunk<PaginatedProductSchema, void, { st
 export const catalogSlice = createSlice({
     name: 'catalog',
     initialState: productAdapter.getInitialState<CatalogState>(initialState),
-    reducers: {},
+    reducers: {
+        setProductParams: (state, action) => {
+            const prevProductParams = state.productParams;
+            state.productParams = { ...state.productParams, ...action.payload };
+
+            if (_.isEqual(prevProductParams, state.productParams) === false) {
+                state.loaded = false;
+            }
+        }
+    },
     extraReducers: builder => {
         builder.addCase(fetchCategories.pending, (state, action) => {
             state.filters.categories.state = 'loading';
@@ -128,3 +143,5 @@ export const catalogSlice = createSlice({
 })
 
 export const productSelectors = productAdapter.getSelectors((state: RootState) => state.catalog)
+
+export const { setProductParams } = catalogSlice.actions; 

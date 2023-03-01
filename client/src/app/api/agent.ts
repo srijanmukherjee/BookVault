@@ -14,7 +14,7 @@ async function fetchCategories() {
     })
 }
 
-interface SearchParams {
+export interface SearchParams {
     page: number;
     itemsPerPage: number;
     search?: string;
@@ -23,7 +23,10 @@ interface SearchParams {
 
 async function fetchProducts({ page, itemsPerPage, search, category }: SearchParams = { page: 1, itemsPerPage: 20 }) {
     return await client.query<PaginatedProductSchema>({
-        query: FETCH_PRODUCTS
+        query: FETCH_PRODUCTS,
+        variables: {
+            page, itemsPerPage, search, category
+        }
     })
 }
 

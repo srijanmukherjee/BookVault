@@ -12,20 +12,25 @@ import CatalogList from "./CatalogList";
 import CatalogFilters from "./filters/CatalogFilters";
 import { gql, useQuery } from "@apollo/client";
 import { useAppDispatch, useAppSelector } from "../../app/store";
-import { fetchCategories, fetchProducts } from "./catalogSlice";
+import {
+	fetchCategories,
+	fetchProducts,
+	setProductParams,
+} from "./catalogSlice";
 
 export default function Catalog() {
-	const [page, setPage] = useState<number>(1);
 	const dispatch = useAppDispatch();
-	const { pagination } = useAppSelector((state) => state.catalog);
+	const { pagination, status, productParams } = useAppSelector(
+		(state) => state.catalog
+	);
 
 	useEffect(() => {
 		Promise.all([dispatch(fetchProducts()), dispatch(fetchCategories())]);
 	}, [dispatch]);
 
 	useEffect(() => {
-		window.scrollTo({ top: 0, behavior: "smooth" });
-	}, [page]);
+		dispatch(fetchProducts());
+	}, [productParams, dispatch]);
 
 	return (
 		<>
@@ -53,7 +58,10 @@ export default function Catalog() {
 								page={pagination.currentPage}
 								boundaryCount={2}
 								color="secondary"
-								onChange={(_, value) => setPage(value)}
+								onChange={(_, value) => {
+									dispatch(setProductParams({ page: value }));
+								}}
+								disabled={status === "products-loading"}
 							/>
 						)}
 					</Grid>
