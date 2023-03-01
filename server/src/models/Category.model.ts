@@ -1,17 +1,17 @@
 import 'reflect-metadata';
-import { ObjectType, Field, Resolver, Query } from 'type-graphql';
+import { ObjectType, Field, Resolver, Query, ID } from 'type-graphql';
 import { client } from '../db';
 import { Book } from './Book.model';
 
 @ObjectType("Category")
 export class Category {
-    @Field()
+    @Field(type => ID)
     id: number
 
     @Field()
     name: string
 
-    @Field()
+    @Field(type => [Book])
     books: Book[]
 }
 
