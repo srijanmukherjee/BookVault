@@ -10,7 +10,7 @@ const app: Express = express();
 const port = process.env.PORT || 8000;
 
 const schema = buildSchemaSync({
-  resolvers: [BookResolver]
+  resolvers: [BookResolver],
 })
 
 app.get('/', (req: Request, res: Response) => {
@@ -19,7 +19,7 @@ app.get('/', (req: Request, res: Response) => {
 
 app.use('/graphql', graphqlHTTP({
   schema,
-  graphiql: true
+  graphiql: true,
 }));
 
 app.listen(port, () => {

@@ -1,8 +1,8 @@
 import 'reflect-metadata';
-import { ObjectType, Field, ID, buildSchemaSync, Resolver, Query } from 'type-graphql';
+import { ObjectType, Field, Resolver, Query } from 'type-graphql';
 import { client } from '../db';
 
-@ObjectType()
+@ObjectType("Book")
 export class Book {
     @Field()
     id: number
@@ -15,6 +15,12 @@ export class Book {
 
     @Field()
     image: string
+
+    @Field()
+    slug: string
+
+    @Field()
+    format: string
 
     @Field()
     pages: number

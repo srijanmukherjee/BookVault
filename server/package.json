@@ -8,6 +8,9 @@
     "start": "node dist/app.js",
     "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/app.js\""
   },
+  "prisma": {
+    "seed": "ts-node src/seed.ts"
+  },
   "dependencies": {
     "@prisma/client": "4.10.1",
     "class-validator": "^0.14.0",
@@ -16,6 +19,7 @@
     "express-graphql": "^0.12.0",
     "graphql": "^15.3.0",
     "reflect-metadata": "^0.1.13",
+    "ts-node": "^10.9.1",
     "type-graphql": "^1.1.1"
   },
   "devDependencies": {
