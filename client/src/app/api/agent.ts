@@ -1,7 +1,6 @@
 import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
 import { FETCH_CATEGORIES, FETCH_PRODUCTS } from "./queries";
 import { CategoriesSchema, PaginatedProductSchema } from "./schema";
-import { Category } from "../models/filters";
 
 export const client = new ApolloClient({
     uri: 'http://localhost:8080/graphql',

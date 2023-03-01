@@ -1,16 +1,8 @@
-import {
-	Box,
-	CircularProgress,
-	Container,
-	Grid,
-	Pagination,
-	useTheme,
-} from "@mui/material";
-import { useEffect, useState } from "react";
+import { Container, Grid, Pagination } from "@mui/material";
+import { useEffect } from "react";
 import CatalogHeader from "./CatalogHeader";
 import CatalogList from "./CatalogList";
 import CatalogFilters from "./filters/CatalogFilters";
-import { gql, useQuery } from "@apollo/client";
 import { useAppDispatch, useAppSelector } from "../../app/store";
 import {
 	fetchCategories,

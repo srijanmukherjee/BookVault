@@ -1,6 +1,6 @@
 import { createAsyncThunk, createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 import { Category } from "../../app/models/filters";
-import { SearchParams, client, requests } from "../../app/api/agent";
+import { SearchParams, requests } from "../../app/api/agent";
 import { Product } from "../../app/models/product";
 import { PaginatedProductSchema } from "../../app/api/schema";
 import { RootState } from "../../app/store";
