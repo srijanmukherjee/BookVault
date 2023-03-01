@@ -1,5 +1,6 @@
-import { client } from "./db";
-import booksJSON from "../prisma/books.json";
+import path from "path";
+import { client } from "../src/db";
+import { readFileSync } from "fs";
 
 interface Options {
     exclude?: {
@@ -27,7 +28,7 @@ interface ProcessedBook {
     slug: string;
 }
 
-function preprocess(books: any[], options: Options): [ProcessedBook[], string[], string[]] {
+function preprocess(books: BookObj[], options: Options): [ProcessedBook[], string[], string[]] {
     const processed_books: ProcessedBook[] = [];
     const categories = new Set<string>();
     const formats: Set<string> = new Set<string>();
@@ -35,8 +36,8 @@ function preprocess(books: any[], options: Options): [ProcessedBook[], string[],
     for (const book of books) {
         if (options.exclude?.format?.includes(book.format) || !book.pages || !book.format || book.genres.length == 0 || !book.title || !book.author) continue;
 
-        const _categories = book.genres.filter((cat: string) => !options.exclude?.category?.includes(cat));
-        _categories.forEach((cat: string) => categories.add(cat));
+        const _categories = book.genres.filter((cat) => !options.exclude?.category?.includes(cat));
+        _categories.forEach((cat) => categories.add(cat));
         formats.add(book.format);
         const processed_book = {
             title: book.title,
@@ -57,6 +58,7 @@ function preprocess(books: any[], options: Options): [ProcessedBook[], string[],
 }
 
 async function main() {
+    const booksJSON = JSON.parse(readFileSync(path.join(__dirname, "books.json")).toString());
     const [books, categories, formats] = preprocess(booksJSON, {
         exclude: {
             category: ['Audiobook'],
