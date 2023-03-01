@@ -25,11 +25,19 @@ interface ProcessedBook {
     pages: number;
     format: string;
     categories: string[];
-    slug: string;
 }
 
-function preprocess(books: BookObj[], options: Options): [ProcessedBook[], string[], string[]] {
-    const processed_books: ProcessedBook[] = [];
+interface Product {
+    slug: string;
+    book: ProcessedBook;
+    price: number;
+    discount: number;
+    featured: boolean;
+    rating: number;
+}
+
+function preprocess(books: BookObj[], options: Options): [Product[], string[], string[]] {
+    const processed_products: Product[] = [];
     const categories = new Set<string>();
     const formats: Set<string> = new Set<string>();
 
@@ -46,20 +54,26 @@ function preprocess(books: BookObj[], options: Options): [ProcessedBook[], strin
             pages: book.pages,
             format: book.format,
             categories: _categories,
-            slug: book.title.toLowerCase().replace(/ /g, '-').replace(/[-]+/g, '-').replace(/[^\w-]+/g, '')
         }
 
         if (processed_book.categories.length == 0) continue;
 
-        processed_books.push(processed_book);
+        processed_products.push({
+            slug: book.title.toLowerCase().replace(/ /g, '-').replace(/[-]+/g, '-').replace(/[^\w-]+/g, ''),
+            book: processed_book,
+            price: Math.floor(Math.random() * 100000) + 20000,
+            discount: Math.floor(Math.random() * 15),
+            featured: Math.random() < 0.2,
+            rating: Math.floor(Math.random() * (10 + 1)) * 5 / 10 // gives values between 0 and 5 with step size 0.5
+        });
     }
 
-    return [processed_books, Array.from(categories.values()), Array.from(formats.values())];
+    return [processed_products, Array.from(categories.values()), Array.from(formats.values())];
 }
 
 async function main() {
-    const booksJSON = JSON.parse(readFileSync(path.join(__dirname, "books.json")).toString());
-    const [books, categories, formats] = preprocess(booksJSON, {
+    const booksJSON = JSON.parse(readFileSync(path.join(__dirname, "../prisma/books.json")).toString());
+    const [products, categories, formats] = preprocess(booksJSON, {
         exclude: {
             category: ['Audiobook'],
             format: ['ebook', 'Kindle Edition']
@@ -77,7 +91,8 @@ async function main() {
         category_id_map[category] = result.id;
     }
 
-    for (const book of books) {
+    for (const product of products) {
+        const { book } = product;
         try {
             const record = await client.book.create({
                 data: {
@@ -88,11 +103,24 @@ async function main() {
                     format: book.format,
                     categories: {
                         connect: book.categories.map(category => ({ id: category_id_map[category] }))
-                    },
-                    slug: book.slug
+                    }
                 }
             });
-            console.log(`🟩 ${record.id} | ${record.name}`);
+            const productRecord = await client.product.create({
+                data: {
+                    slug: product.slug,
+                    rating: product.rating,
+                    price: product.price,
+                    discount: product.discount,
+                    featured: product.featured,
+                    book: {
+                        connect: {
+                            id: record.id
+                        }
+                    }
+                }
+            })
+            console.log(`🟩 ${productRecord.id} | ${record.name}`);
         } catch (err: any) {
             console.log(`🟥 ${err.toString()}.`);
             console.log(book);

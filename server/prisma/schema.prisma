@@ -7,15 +7,26 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Product {
+  id       Int     @id @default(autoincrement())
+  slug     String  @unique
+  book     Book    @relation(references: [id], fields: [bookId])
+  bookId   Int     @unique
+  price    BigInt
+  discount Float   @default(0)
+  featured Boolean @default(false)
+  rating   Float   @default(0)
+}
+
 model Book {
   id         Int        @id @default(autoincrement())
   name       String
   author     String
   image      String
   pages      Int
-  slug       String     @unique
   format     String
   categories Category[] @relation("BookToCategory")
+  product    Product?
 }
 
 model Category {
@@ -23,3 +34,8 @@ model Category {
   name  String
   books Book[] @relation("BookToCategory")
 }
+
+// model Review {
+//   id Int @id @default(autoincrement())
+//   // user
+// }

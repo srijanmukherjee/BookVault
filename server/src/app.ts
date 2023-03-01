@@ -4,6 +4,7 @@ import { graphqlHTTP } from 'express-graphql';
 import { buildSchemaSync } from 'type-graphql';
 import { BookResolver } from './models/Book.model';
 import { CategoryResolver } from './models/Category.model';
+import { ProductResolver } from './models/Product.model';
 
 dotenv.config();
 
@@ -11,7 +12,7 @@ const app: Express = express();
 const port = process.env.PORT || 8000;
 
 const schema = buildSchemaSync({
-  resolvers: [BookResolver, CategoryResolver],
+  resolvers: [BookResolver, CategoryResolver, ProductResolver],
 })
 
 app.get('/', (req: Request, res: Response) => {
