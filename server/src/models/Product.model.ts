@@ -18,6 +18,9 @@ export class Product {
     slug: string
 
     @Field()
+    price: number
+
+    @Field()
     discount: number
 
     @Field()

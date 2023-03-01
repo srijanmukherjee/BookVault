@@ -12,7 +12,7 @@ model Product {
   slug     String  @unique
   book     Book    @relation(references: [id], fields: [bookId])
   bookId   Int     @unique
-  price    BigInt
+  price    Int
   discount Float   @default(0)
   featured Boolean @default(false)
   rating   Float   @default(0)
