@@ -1,6 +1,8 @@
 import {
 	Box,
+	Button,
 	Checkbox,
+	Collapse,
 	FormControlLabel,
 	FormGroup,
 	List,
@@ -10,47 +12,56 @@ import {
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import CollapsableFilter from "./CollapsableFilter";
+import { useState } from "react";
 
-const categories = [
-	"Action & Adventure",
-	"Arts, Film & Photography",
-	"Biographies, Diaries & True accounts",
-	"Business & Economics",
-	"Crafts, Hobbies & Home",
-	"Engineering",
-	"History",
-	"Law",
-	"Literature & Fiction",
-	"Maps & Atlases",
-	"Medicine & Health Science Textbooks",
-	"Politics",
-	"Religion & Spirituality",
-	"Sports",
-	"Travel & Tourism",
-];
+const CATEGORY_COUNT = 20;
 
-export default function CatalogFilters() {
+interface Props {
+	categories: { id: number; name: string }[];
+}
+
+function renderCategory(category: { id: number; name: string }, index: number) {
+	return (
+		<Typography
+			key={index}
+			component={Link}
+			to="#"
+			sx={{
+				color: "text.primary",
+				textDecoration: "none",
+				mt: 1,
+				fontSize: "small",
+				"&:hover": {
+					color: "warning.light",
+				},
+			}}>
+			{category.name}
+		</Typography>
+	);
+}
+
+export default function CatalogFilters({ categories }: Props) {
+	const [categoriesMore, setCategoriesMore] = useState(false);
+
 	return (
 		<Box component={Paper} elevation={2}>
 			<List aria-labelledby="filters-list">
 				<CollapsableFilter label="Category">
-					{categories.map((category, index) => (
-						<Typography
-							key={index}
-							component={Link}
-							to="#"
-							sx={{
-								color: "text.primary",
-								textDecoration: "none",
-								mt: 1,
-								fontSize: "small",
-								"&:hover": {
-									color: "warning.light",
-								},
-							}}>
-							{category}
-						</Typography>
-					))}
+					{categories.slice(0, CATEGORY_COUNT).map(renderCategory)}
+					<Collapse in={categoriesMore} timeout="auto" unmountOnExit>
+						<Box sx={{ display: "flex", flexDirection: "column" }}>
+							{categories
+								.slice(CATEGORY_COUNT)
+								.map(renderCategory)}
+						</Box>
+					</Collapse>
+
+					{categories.length > CATEGORY_COUNT && (
+						<Button
+							onClick={() => setCategoriesMore(!categoriesMore)}>
+							{categoriesMore ? "Less" : "More"}
+						</Button>
+					)}
 				</CollapsableFilter>
 
 				<CollapsableFilter label="Condition">

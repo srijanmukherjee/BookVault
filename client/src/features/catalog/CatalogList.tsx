@@ -1,5 +1,6 @@
 import { Divider, List, Typography } from "@mui/material";
 import CatalogListItem from "./CatalogListItem";
+import { Fragment } from "react";
 
 interface Props {
 	products: any[];
@@ -16,17 +17,16 @@ export default function CatalogList({ products }: Props) {
 					width: "100%",
 					bgcolor: "background.paper",
 				}}>
-				{products.map((product, index) => {
+				{products.slice(0, 16).map((product, index) => {
 					return (
-						<>
+						<Fragment key={index}>
 							<CatalogListItem
 								product={{ ...product, sponsored: index < 2 }}
-								key={index}
 							/>{" "}
 							{index < products.length - 1 && (
 								<Divider variant="fullWidth" component="li" />
 							)}
-						</>
+						</Fragment>
 					);
 				})}
 			</List>

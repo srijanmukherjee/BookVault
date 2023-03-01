@@ -4,13 +4,17 @@ import App from "./app/layout/App";
 import "./index.css";
 import { createBrowserHistory } from "history";
 import HistoryRouter from "./app/components/HistoryRouter";
+import { ApolloProvider } from "@apollo/client";
+import { client } from "./app/api/agent";
 
 export const browserHistory = createBrowserHistory();
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
 	<React.StrictMode>
-		<HistoryRouter history={browserHistory}>
-			<App />
-		</HistoryRouter>
+		<ApolloProvider client={client}>
+			<HistoryRouter history={browserHistory}>
+				<App />
+			</HistoryRouter>
+		</ApolloProvider>
 	</React.StrictMode>
 );
