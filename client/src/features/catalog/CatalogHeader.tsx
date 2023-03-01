@@ -1,7 +1,12 @@
-import { Box, Container, Typography } from "@mui/material";
+import { Box, Container, Skeleton, Typography } from "@mui/material";
 import SortFilters from "./filters/SortFilters";
+import { useAppSelector } from "../../app/store";
+import { clamp } from "lodash";
 
 export default function CatalogHeader() {
+	const { pagination, productParams, status } = useAppSelector(
+		(state) => state.catalog
+	);
 	return (
 		<Box sx={{ backgroundColor: "neutral", boxShadow: 3 }}>
 			<Container
@@ -11,7 +16,27 @@ export default function CatalogHeader() {
 					justifyContent: "space-between",
 					alignItems: "center",
 				}}>
-				<Typography>1-16 of over 100,000 results for "book"</Typography>
+				{status === "products-loading" ? (
+					<Skeleton
+						variant="text"
+						sx={{ fontSize: "1rem", width: "12ch" }}
+					/>
+				) : (
+					<Typography>
+						{(pagination.currentPage - 1) *
+							pagination.itemsPerPage +
+							1}
+						-
+						{clamp(
+							pagination.currentPage * pagination.itemsPerPage,
+							0,
+							pagination.itemCount
+						)}{" "}
+						of {pagination.itemCount} results{" "}
+						{productParams.search &&
+							`for "${productParams.search}"`}
+					</Typography>
+				)}
 				<SortFilters />
 			</Container>
 		</Box>
