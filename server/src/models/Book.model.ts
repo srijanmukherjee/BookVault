@@ -17,9 +17,6 @@ export class Book {
     image: string
 
     @Field()
-    slug: string
-
-    @Field()
     format: string
 
     @Field()
