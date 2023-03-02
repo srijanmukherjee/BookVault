@@ -1,5 +1,5 @@
 import { Box, Tab, Tabs, Typography } from "@mui/material";
-import { SyntheticEvent, useCallback, useEffect, useState } from "react";
+import { SyntheticEvent, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../app/store";
 import { setProductParams } from "../catalogSlice";
 import { SortingOptions } from "../../../app/api/agent";
@@ -12,19 +12,21 @@ const sortingOptions: { label: string; value: SortingOptions }[] = [
 
 export default function SortFilters() {
 	const dispatch = useAppDispatch();
-	const { status } = useAppSelector((state) => state.catalog);
-	const [tabIndex, setTabIndex] = useState(0);
-	const handleChange = (event: SyntheticEvent, newValue: number) => {
+	const { status, productParams } = useAppSelector((state) => state.catalog);
+	const [tabIndex, setTabIndex] = useState(
+		sortingOptions.findIndex(({ value }) => value === productParams.sortBy)
+	);
+
+	const handleChange = (_: SyntheticEvent, newValue: number) => {
 		setTabIndex(newValue);
-	};
-	useEffect(() => {
 		dispatch(
 			setProductParams({
-				sortBy: sortingOptions[tabIndex].value,
+				sortBy: sortingOptions[newValue].value,
 				page: 1,
 			})
 		);
-	}, [dispatch, tabIndex]);
+	};
+
 	return (
 		<Box display="flex" alignItems="center">
 			<Typography variant="button" mr={1}>
@@ -34,7 +36,7 @@ export default function SortFilters() {
 				disabled={status === "products-loading"}
 				value={tabIndex}
 				onChange={handleChange}
-				aria-label="Tabs where selection follows focus"
+				aria-label="Sorting options"
 				selectionFollowsFocus
 				sx={{ py: 0 }}>
 				{sortingOptions.map(({ label }, index) => (
