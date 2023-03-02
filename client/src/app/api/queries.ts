@@ -10,8 +10,8 @@ export const FETCH_CATEGORIES = gql`
 `
 
 export const FETCH_PRODUCTS = gql`
-    query FetchProducts($page: Int!, $itemsPerPage: Int!, $search: String, $category: Int) {
-        products(page: $page, itemsPerPage: $itemsPerPage, search: $search, category: $category) {
+    query FetchProducts($page: Int!, $itemsPerPage: Int!, $search: String, $category: Int, $sortBy: ProductSortingOption) {
+        products(page: $page, itemsPerPage: $itemsPerPage, search: $search, category: $category, sortBy: $sortBy) {
             data {
                 id
                 book {

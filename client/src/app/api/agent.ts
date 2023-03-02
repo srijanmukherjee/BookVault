@@ -13,18 +13,21 @@ async function fetchCategories() {
     })
 }
 
+export type SortingOptions = 'RELEVANCE' | 'PRICE_HIGH_TO_LOW' | 'PRICE_LOW_TO_HIGH'
+
 export interface SearchParams {
     page: number;
     itemsPerPage: number;
     search?: string;
     category?: number;
+    sortBy?: SortingOptions
 }
 
-async function fetchProducts({ page, itemsPerPage, search, category }: SearchParams = { page: 1, itemsPerPage: 20 }) {
+async function fetchProducts({ page, itemsPerPage, search, category, sortBy }: SearchParams = { page: 1, itemsPerPage: 20, sortBy: 'RELEVANCE' }) {
     return await client.query<PaginatedProductSchema>({
         query: FETCH_PRODUCTS,
         variables: {
-            page, itemsPerPage, search, category
+            page, itemsPerPage, search, category, sortBy
         }
     })
 }

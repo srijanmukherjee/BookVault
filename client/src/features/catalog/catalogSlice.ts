@@ -1,6 +1,6 @@
 import { createAsyncThunk, createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 import { Category } from "../../app/models/filters";
-import { SearchParams, requests } from "../../app/api/agent";
+import { SearchParams, SortingOptions, requests } from "../../app/api/agent";
 import { Product } from "../../app/models/product";
 import { PaginatedProductSchema } from "../../app/api/schema";
 import { RootState } from "../../app/store";
@@ -48,7 +48,8 @@ const initialState: CatalogState = {
     },
     productParams: {
         page: 1,
-        itemsPerPage: 20
+        itemsPerPage: 20,
+        sortBy: 'RELEVANCE'
     }
 }
 
