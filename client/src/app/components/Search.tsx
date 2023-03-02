@@ -1,6 +1,10 @@
-import { Box, InputBase, alpha, styled } from "@mui/material";
+import { Box, InputBase, alpha, debounce, styled } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useAppDispatch } from "../store";
+import { setProductParams } from "../../features/catalog/catalogSlice";
+
+const SEARCH_DEBOUNCE_TIME = 1000;
 
 const SearchBar = styled("div")(({ theme }) => ({
 	position: "relative",
@@ -49,18 +53,35 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 export default function Search() {
-	const [value, setValue] = useState("");
+	const dispatch = useAppDispatch();
+	const [searchText, setSearchText] = useState("");
+	const handleSearch = useMemo(
+		() =>
+			debounce((event: any) => {
+				dispatch(
+					setProductParams({
+						search: event.target.value,
+						page: 1,
+					})
+				);
+			}, SEARCH_DEBOUNCE_TIME),
+		[dispatch]
+	);
+
 	return (
 		<Box flexGrow="1" display="flex" justifyContent="flex-end">
-			<SearchBar className={value ? "open" : ""}>
+			<SearchBar className={searchText ? "open" : ""}>
 				<SearchIconWrapper>
 					<SearchIcon />
 				</SearchIconWrapper>
 				<StyledInputBase
 					placeholder="Search…"
 					inputProps={{ "aria-label": "search" }}
-					value={value}
-					onChange={(event) => setValue(event.currentTarget.value)}
+					value={searchText}
+					onChange={(event) => {
+						setSearchText(event.currentTarget.value);
+						handleSearch(event);
+					}}
 				/>
 			</SearchBar>
 		</Box>

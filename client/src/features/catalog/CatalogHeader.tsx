@@ -23,16 +23,24 @@ export default function CatalogHeader() {
 					/>
 				) : (
 					<Typography>
-						{(pagination.currentPage - 1) *
-							pagination.itemsPerPage +
-							1}
-						-
-						{clamp(
-							pagination.currentPage * pagination.itemsPerPage,
-							0,
-							pagination.itemCount
+						{pagination.currentPage > 0 ? (
+							<>
+								{(pagination.currentPage - 1) *
+									pagination.itemsPerPage +
+									1}
+								-
+								{clamp(
+									pagination.currentPage *
+										pagination.itemsPerPage,
+									0,
+									pagination.itemCount
+								)}{" "}
+								of {pagination.itemCount}
+							</>
+						) : (
+							"No"
 						)}{" "}
-						of {pagination.itemCount} results{" "}
+						results{" "}
 						{productParams.search &&
 							`for "${productParams.search}"`}
 					</Typography>
