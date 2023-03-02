@@ -109,15 +109,17 @@ export class ProductResolver {
                 OR: [
                     {
                         name: {
-                            contains: search
+                            contains: search,
+                            mode: 'insensitive'
                         },
                     },
                     {
                         author: {
-                            contains: search
+                            contains: search,
+                            mode: 'insensitive'
                         }
                     }
-                ]
+                ],
             }
         }
         return query
