@@ -9,6 +9,7 @@ import {
 	useTheme,
 } from "@mui/material";
 import { Link } from "react-router-dom";
+import Image from "mui-image";
 
 interface Props {
 	product: any;
@@ -26,7 +27,7 @@ export default function CatalogListItem({ product }: Props) {
 					display: "grid",
 					aspectRatio: "1/1",
 				}}>
-				<img
+				<Image
 					src={product.book.image}
 					alt={product.book.name}
 					width="100%"

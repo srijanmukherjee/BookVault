@@ -730,6 +730,13 @@
   resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.191.tgz#09511e7f7cba275acd8b419ddac8da9a6a79e2fa"
   integrity sha512-BdZ5BCCvho3EIXw6wUCXHe7rS53AIDPLE+JzwgT+OsJk53oBfbSmZZ7CX4VaRoN78N+TJpFi9QPlfIVNmJYWxQ==
 
+"@types/mui-image@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@types/mui-image/-/mui-image-1.0.1.tgz#26f2ab97a640e0f1d81d94dbc276f8146fdc768f"
+  integrity sha512-HE+irW/EbADq6LrObWQIzpYu7sFHcTZTzp0K4JuKp2IUYGTkQhw2cVsJP2tk5h26Ex/MzDAMOXtmw71Z3SOTaQ==
+  dependencies:
+    "@types/react" "*"
+
 "@types/parse-json@^4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.0.tgz#2f8bb441434d163b35fb8ffdccd7138927ffb8c0"
@@ -1288,6 +1295,11 @@ ms@2.1.2:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.2.tgz#d09d1f357b443f493382a8eb3ccd183872ae6009"
   integrity sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==
+
+mui-image@^1.0.7:
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/mui-image/-/mui-image-1.0.7.tgz#f665432d2cbf6140a34903b9a5143560ebd4df27"
+  integrity sha512-U79TWMKMfMC1ZiGnv/M+SaVJeUpubEjXOdy7w53RsvidUAMZ+4nW+QmDG9yg5fgWeYy6YJgLHyI9BHSDw76iIg==
 
 nanoid@^3.3.4:
   version "3.3.4"
