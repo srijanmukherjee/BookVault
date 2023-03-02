@@ -13,18 +13,25 @@ import {
 import { Link } from "react-router-dom";
 import CollapsableFilter from "./CollapsableFilter";
 import { useState } from "react";
-import { useAppSelector } from "../../../app/store";
+import { useAppDispatch, useAppSelector } from "../../../app/store";
+import { setProductParams } from "../catalogSlice";
 
 const CATEGORY_COUNT = 20;
 
 interface Props {}
 
-function renderCategory(category: { id: number; name: string }, index: number) {
+function renderCategory(
+	category: { id: number; name: string },
+	index: number,
+	handleClick: (id: number) => void,
+	disabled: boolean
+) {
 	return (
 		<Typography
 			key={index}
 			component={Link}
 			to="#"
+			onClick={() => !disabled && handleClick(category.id)}
 			sx={{
 				color: "text.primary",
 				textDecoration: "none",
@@ -41,8 +48,13 @@ function renderCategory(category: { id: number; name: string }, index: number) {
 
 export default function CatalogFilters({}: Props) {
 	const [categoriesMore, setCategoriesMore] = useState(false);
-	const { filters } = useAppSelector((state) => state.catalog);
+	const { filters, status } = useAppSelector((state) => state.catalog);
 	const { data: categories, state } = filters.categories;
+	const dispatch = useAppDispatch();
+
+	const handleCategoryClick = (category: any) => {
+		dispatch(setProductParams({ category: parseInt(category) }));
+	};
 
 	return (
 		<Box component={Paper} elevation={2}>
@@ -50,12 +62,28 @@ export default function CatalogFilters({}: Props) {
 				<CollapsableFilter
 					label="Category"
 					loading={state === "loading"}>
-					{categories.slice(0, CATEGORY_COUNT).map(renderCategory)}
+					{categories
+						.slice(0, CATEGORY_COUNT)
+						.map((category, index) =>
+							renderCategory(
+								category,
+								index,
+								handleCategoryClick,
+								status === "products-loading"
+							)
+						)}
 					<Collapse in={categoriesMore} timeout="auto" unmountOnExit>
 						<Box sx={{ display: "flex", flexDirection: "column" }}>
 							{categories
 								.slice(CATEGORY_COUNT)
-								.map(renderCategory)}
+								.map((category, index) =>
+									renderCategory(
+										category,
+										index,
+										handleCategoryClick,
+										status === "products-loading"
+									)
+								)}
 						</Box>
 					</Collapse>
 
