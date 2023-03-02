@@ -6,6 +6,6 @@ COPY package.json .
 
 RUN yarn
 
-EXPOSE 8000
+EXPOSE 8000 5555
 
 CMD [ "yarn", "dev" ]
