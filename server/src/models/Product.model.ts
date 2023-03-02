@@ -61,8 +61,10 @@ class PaginatedProductsResponse extends PaginatedResponse {
 export class ProductResolver {
     @Query((returns) => PaginatedProductsResponse, { nullable: true })
     async products(@Args() { page, itemsPerPage, search, category }: ProductParams) {
+        const query = this.buildQuery(search, category);
+
         const [itemCount, products] = await client.$transaction([
-            client.product.count(),
+            client.product.count({ where: query }),
             client.product.findMany({
                 include: {
                     book: {
@@ -74,30 +76,48 @@ export class ProductResolver {
                 take: itemsPerPage,
                 skip: (page - 1) * itemsPerPage,
 
-                where: this.buildQuery(search, category)
+                where: query,
             })
         ]);
 
         const totalPages = Math.ceil(itemCount / itemsPerPage);
 
-        return { data: products, totalPages, currentPage: page, itemsPerPage, itemCount };
+        return { data: products, totalPages, currentPage: totalPages == 0 ? -1 : page, itemsPerPage, itemCount };
     }
 
     buildQuery(search?: string, category?: number): any {
-        let query = {}
+        const query = {
+            book: {}
+        }
 
         if (category) {
-            query = {
-                ...query,
-                book: {
-                    categories: {
-                        some: {
-                            id: {
-                                equals: category
-                            }
+            query.book = {
+                ...query.book,
+                categories: {
+                    some: {
+                        id: {
+                            equals: category
                         }
                     }
                 }
+            }
+        }
+
+        if (search && search.length > 0) {
+            query.book = {
+                ...query.book,
+                OR: [
+                    {
+                        name: {
+                            contains: search
+                        },
+                    },
+                    {
+                        author: {
+                            contains: search
+                        }
+                    }
+                ]
             }
         }
         return query
