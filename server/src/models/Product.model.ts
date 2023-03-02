@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { ObjectType, Field, Resolver, Query, ID, ArgsType, Int, Args } from 'type-graphql';
+import { ObjectType, Field, Resolver, Query, ID, ArgsType, Int, Args, registerEnumType } from 'type-graphql';
 import { client } from '../db';
 import { Book } from './Book.model';
 import { DEFAULT_ITEMS_PER_PAGE, MAX_ITEMS_PER_PAGE } from './constants';
@@ -33,6 +33,17 @@ export class Product {
     rating: number
 }
 
+enum ProductSortingType {
+    RELEVANCE,
+    PRICE_LOW_TO_HIGH,
+    PRICE_HIGH_TO_LOW
+}
+
+registerEnumType(ProductSortingType, {
+    name: "ProductSortingOption",
+    description: "Accepted sorting modes"
+})
+
 @ArgsType()
 class ProductParams {
     @Field(type => Int)
@@ -49,6 +60,9 @@ class ProductParams {
 
     @Field(type => Int, { nullable: true })
     category?: number
+
+    @Field(type => ProductSortingType, { nullable: true })
+    sortBy?: ProductSortingType = ProductSortingType.RELEVANCE
 }
 
 @ObjectType()
@@ -60,23 +74,24 @@ class PaginatedProductsResponse extends PaginatedResponse {
 @Resolver(Product)
 export class ProductResolver {
     @Query((returns) => PaginatedProductsResponse, { nullable: true })
-    async products(@Args() { page, itemsPerPage, search, category }: ProductParams) {
-        const query = this.buildQuery(search, category);
+    async products(@Args() { page, itemsPerPage, search, category, sortBy }: ProductParams) {
+        const { where, orderBy } = this.buildQuery(search, category, sortBy);
 
         const [itemCount, products] = await client.$transaction([
-            client.product.count({ where: query }),
+            client.product.count({ where }),
             client.product.findMany({
                 include: {
                     book: {
                         include: {
                             categories: true
-                        }
+                        },
                     },
                 },
                 take: itemsPerPage,
                 skip: (page - 1) * itemsPerPage,
 
-                where: query,
+                where,
+                orderBy
             })
         ]);
 
@@ -85,10 +100,12 @@ export class ProductResolver {
         return { data: products, totalPages, currentPage: totalPages == 0 ? -1 : page, itemsPerPage, itemCount };
     }
 
-    buildQuery(search?: string, category?: number): any {
+    buildQuery(search?: string, category?: number, sortBy?: ProductSortingType): any {
         const query = {
             book: {}
         }
+
+        const orderBy: any = {}
 
         if (category) {
             query.book = {
@@ -122,6 +139,30 @@ export class ProductResolver {
                 ],
             }
         }
-        return query
+
+        if (sortBy == null) sortBy = ProductSortingType.RELEVANCE;
+
+        switch (sortBy) {
+            case ProductSortingType.RELEVANCE:
+                // TODO: Produces error, problem with prisma. Bug: https://github.com/prisma/prisma/issues/12247
+                // if (search && search.length > 0) {
+                //     orderBy._relevance = {
+                //         fields: ['book.name'],
+                //         sort: 'asc',
+                //         search
+                //     }
+                // }
+                break;
+
+            case ProductSortingType.PRICE_LOW_TO_HIGH:
+                orderBy.price = 'asc'
+                break;
+
+            case ProductSortingType.PRICE_HIGH_TO_LOW:
+                orderBy.price = 'desc'
+                break;
+        }
+
+        return { where: query, orderBy }
     }
 }
