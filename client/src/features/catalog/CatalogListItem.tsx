@@ -23,9 +23,6 @@ export default function CatalogListItem({ product }: Props) {
 			<ListItemAvatar
 				sx={{
 					width: "248px",
-					maxHeight: "248px",
-					display: "grid",
-					aspectRatio: "1/1",
 				}}>
 				<Image
 					src={product.book.image}

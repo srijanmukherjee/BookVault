@@ -9,14 +9,15 @@ import CatalogListItem from "./CatalogListItem";
 import { Fragment } from "react";
 import { useAppSelector } from "../../app/store";
 import { productSelectors } from "./catalogSlice";
+import CatalogListItemSkeleton from "./CatalogListItemSkeleton";
 
 export default function CatalogList() {
 	const products = useAppSelector((state) =>
 		productSelectors.selectAll(state)
 	);
-	const { status } = useAppSelector((state) => state.catalog);
+	const { status, loaded } = useAppSelector((state) => state.catalog);
 
-	if (status === "products-loading") {
+	if (status === "products-loading" && products.length == 0) {
 		return (
 			<Box
 				display="grid"
@@ -40,16 +41,36 @@ export default function CatalogList() {
 					bgcolor: "background.paper",
 				}}>
 				{products.map((product, index) => {
-					return (
-						<Fragment key={index}>
-							<CatalogListItem
-								product={{ ...product, sponsored: index < 2 }}
-							/>{" "}
-							{index < products.length - 1 && (
-								<Divider variant="fullWidth" component="li" />
-							)}
-						</Fragment>
-					);
+					if (status === "products-loading") {
+						return (
+							<Fragment key={index}>
+								<CatalogListItemSkeleton product={product} />
+								{index < products.length - 1 && (
+									<Divider
+										variant="fullWidth"
+										component="li"
+									/>
+								)}
+							</Fragment>
+						);
+					} else {
+						return (
+							<Fragment key={index}>
+								<CatalogListItem
+									product={{
+										...product,
+										sponsored: index < 2,
+									}}
+								/>{" "}
+								{index < products.length - 1 && (
+									<Divider
+										variant="fullWidth"
+										component="li"
+									/>
+								)}
+							</Fragment>
+						);
+					}
 				})}
 			</List>
 		</>
