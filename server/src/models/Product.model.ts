@@ -135,7 +135,7 @@ export class ProductResolver {
             }
         }
 
-        if (languages) {
+        if (languages && languages.length > 0) {
             query.book = {
                 ...query.book,
                 OR: languages.map((id) => ({
