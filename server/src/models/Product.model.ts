@@ -83,7 +83,9 @@ export class ProductResolver {
                 include: {
                     book: {
                         include: {
-                            categories: true
+                            categories: true,
+                            languages: true,
+                            product: true
                         },
                     },
                 },

@@ -44,13 +44,12 @@ const shuffle = (array: any[]) => {
         const j = Math.floor(Math.random() * (i + 1));
         [array[i], array[j]] = [array[j], array[i]];
     }
+    return array;
 }
 
 const generateRandomLanguageSet = (): string[] => {
-    const len = Math.floor(Math.random() * languages.length) + 1;
-    const languagesCopy = [...languages];
-    shuffle(languagesCopy);
-    return languagesCopy.slice(0, len);
+    const len = Math.random() < 0.5 ? languages.length : Math.floor(Math.random() * (languages.length - 1)) + 1;
+    return shuffle([...languages]).slice(0, len);
 }
 
 function preprocess(books: BookObj[], options: Options): [Product[], string[], string[]] {
@@ -94,7 +93,7 @@ async function main() {
     const [products, categories, formats] = preprocess(booksJSON, {
         exclude: {
             category: ['Audiobook'],
-            format: ['ebook', 'Kindle Edition']
+            format: ['ebook', 'Kindle Edition', 'Audible Audio']
         }
     });
 

@@ -6,6 +6,7 @@ import { BookResolver } from './models/Book.model';
 import { CategoryResolver } from './models/Category.model';
 import { ProductResolver } from './models/Product.model';
 import cors from 'cors';
+import { LanguageResolver } from './models/Language.model';
 
 dotenv.config();
 
@@ -17,7 +18,7 @@ app.use(cors({
 }))
 
 const schema = buildSchemaSync({
-  resolvers: [BookResolver, CategoryResolver, ProductResolver],
+  resolvers: [BookResolver, CategoryResolver, ProductResolver, LanguageResolver],
 })
 
 app.get('/', (req: Request, res: Response) => {
