@@ -63,6 +63,12 @@ class ProductParams {
 
     @Field(type => ProductSortingType, { nullable: true })
     sortBy?: ProductSortingType = ProductSortingType.RELEVANCE
+
+    @Field(type => Int, { nullable: true })
+    rating?: number
+
+    @Field(type => [Int], { nullable: true })
+    languages?: number[]
 }
 
 @ObjectType()
@@ -74,8 +80,8 @@ class PaginatedProductsResponse extends PaginatedResponse {
 @Resolver(Product)
 export class ProductResolver {
     @Query((returns) => PaginatedProductsResponse, { nullable: true })
-    async products(@Args() { page, itemsPerPage, search, category, sortBy }: ProductParams) {
-        const { where, orderBy } = this.buildQuery(search, category, sortBy);
+    async products(@Args() { page, itemsPerPage, search, category, sortBy, rating, languages }: ProductParams) {
+        const { where, orderBy } = this.buildQuery(search, category, sortBy, rating, languages);
 
         const [itemCount, products] = await client.$transaction([
             client.product.count({ where }),
@@ -102,9 +108,10 @@ export class ProductResolver {
         return { data: products, totalPages, currentPage: totalPages == 0 ? -1 : page, itemsPerPage, itemCount };
     }
 
-    buildQuery(search?: string, category?: number, sortBy?: ProductSortingType): any {
+    buildQuery(search?: string, category?: number, sortBy?: ProductSortingType, rating?: number, languages?: number[]): any {
         const query = {
-            book: {}
+            book: {},
+            rating: {}
         }
 
         const orderBy: any = {}
@@ -119,6 +126,25 @@ export class ProductResolver {
                         }
                     }
                 }
+            }
+        }
+
+        if (rating) {
+            query.rating = {
+                gte: rating
+            }
+        }
+
+        if (languages) {
+            query.book = {
+                ...query.book,
+                OR: languages.map((id) => ({
+                    languages: {
+                        some: {
+                            id
+                        }
+                    }
+                }))
             }
         }
 
