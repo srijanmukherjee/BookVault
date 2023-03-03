@@ -50,7 +50,8 @@ const initialState: CatalogState = {
     productParams: {
         page: 1,
         itemsPerPage: 20,
-        sortBy: 'RELEVANCE'
+        sortBy: 'RELEVANCE',
+        languages: []
     }
 }
 

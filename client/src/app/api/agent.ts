@@ -20,14 +20,16 @@ export interface SearchParams {
     itemsPerPage: number;
     search?: string;
     category?: number;
-    sortBy?: SortingOptions
+    sortBy?: SortingOptions;
+    languages?: number[];
+    rating?: number;
 }
 
-async function fetchProducts({ page, itemsPerPage, search, category, sortBy }: SearchParams = { page: 1, itemsPerPage: 20, sortBy: 'RELEVANCE' }) {
+async function fetchProducts({ page, itemsPerPage, search, category, sortBy, languages, rating }: SearchParams = { page: 1, itemsPerPage: 20, sortBy: 'RELEVANCE' }) {
     return await client.query<PaginatedProductSchema>({
         query: FETCH_PRODUCTS,
         variables: {
-            page, itemsPerPage, search, category, sortBy
+            page, itemsPerPage, search, category, sortBy, languages, rating
         }
     })
 }

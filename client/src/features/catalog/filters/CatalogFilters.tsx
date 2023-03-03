@@ -9,14 +9,16 @@ import {
 	Paper,
 	Rating,
 	Typography,
+	debounce,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import CollapsableFilter from "./CollapsableFilter";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../app/store";
 import { setProductParams } from "../catalogSlice";
 
 const CATEGORY_COUNT = 20;
+const FILTER_CHANGE_DEBOUNCE_TIME = 1000;
 
 interface Props {}
 
@@ -48,13 +50,44 @@ function renderCategory(
 
 export default function CatalogFilters({}: Props) {
 	const [categoriesMore, setCategoriesMore] = useState(false);
-	const { filters, status } = useAppSelector((state) => state.catalog);
-	const { categories, languages, status: filterStatus } = filters;
+	const { filters, status, productParams } = useAppSelector(
+		(state) => state.catalog
+	);
+	const { categories, status: filterStatus, languages } = filters;
 	const dispatch = useAppDispatch();
+	const [selectedLanguages, setSelectedLanguages] = useState<boolean[]>([]);
 
 	const handleCategoryClick = (category: any) => {
 		dispatch(setProductParams({ category: parseInt(category) }));
 	};
+
+	const handleLanguageFilterChange = debounce(
+		(selectedLanguages: boolean[]) => {
+			dispatch(
+				setProductParams({
+					languages: selectedLanguages
+						.map((checked, index) =>
+							checked
+								? parseInt(languages[index].id.toString())
+								: null
+						)
+						.filter(Boolean),
+				})
+			);
+		},
+		FILTER_CHANGE_DEBOUNCE_TIME
+	);
+
+	useEffect(() => {
+		if (languages.length === 0) return;
+		if (!productParams.languages || productParams.languages.length === 0) {
+			setSelectedLanguages(new Array(languages.length).fill(false));
+		} else {
+			setSelectedLanguages(
+				languages.map(({ id }) => productParams.languages!.includes(id))
+			);
+		}
+	}, [languages]);
 
 	return (
 		<Box component={Paper} elevation={2}>
@@ -106,19 +139,26 @@ export default function CatalogFilters({}: Props) {
 					label="Language"
 					loading={filterStatus === "loading"}>
 					<FormGroup>
-						{/* {
-							languages.map(({name, id}) => (
-								<FormControlLabel
-									control={<Checkbox />}
-									label={name}
-									key={id}
-								/>
-
-							)
-						} */}
-						{languages.map((language) => (
+						{languages.map((language, index) => (
 							<FormControlLabel
-								control={<Checkbox />}
+								control={
+									<Checkbox
+										value={selectedLanguages[index]}
+										onChange={(event) => {
+											const newSelectedLanguages = [
+												...selectedLanguages,
+											];
+											newSelectedLanguages[index] =
+												event.currentTarget.checked;
+											setSelectedLanguages(
+												newSelectedLanguages
+											);
+											handleLanguageFilterChange(
+												newSelectedLanguages
+											);
+										}}
+									/>
+								}
 								label={language.name}
 								key={language.id}
 							/>

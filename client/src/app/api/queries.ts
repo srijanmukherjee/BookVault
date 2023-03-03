@@ -24,8 +24,8 @@ export const FETCH_FILTERS = gql`
 `
 
 export const FETCH_PRODUCTS = gql`
-    query FetchProducts($page: Int!, $itemsPerPage: Int!, $search: String, $category: Int, $sortBy: ProductSortingOption) {
-        products(page: $page, itemsPerPage: $itemsPerPage, search: $search, category: $category, sortBy: $sortBy) {
+    query FetchProducts($page: Int!, $itemsPerPage: Int!, $search: String, $category: Int, $sortBy: ProductSortingOption, $languages: [Int!], $rating: Int) {
+        products(page: $page, itemsPerPage: $itemsPerPage, search: $search, category: $category, sortBy: $sortBy, languages: $languages, rating: $rating) {
             data {
                 id
                 book {
