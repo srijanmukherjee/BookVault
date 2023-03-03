@@ -25,6 +25,7 @@ interface ProcessedBook {
     pages: number;
     format: string;
     categories: string[];
+    languages: string[];
 }
 
 interface Product {
@@ -34,6 +35,22 @@ interface Product {
     discount: number;
     featured: boolean;
     rating: number;
+}
+
+const languages = ['English', 'German', 'French'];
+
+const shuffle = (array: any[]) => {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+const generateRandomLanguageSet = (): string[] => {
+    const len = Math.floor(Math.random() * languages.length) + 1;
+    const languagesCopy = [...languages];
+    shuffle(languagesCopy);
+    return languagesCopy.slice(0, len);
 }
 
 function preprocess(books: BookObj[], options: Options): [Product[], string[], string[]] {
@@ -54,6 +71,7 @@ function preprocess(books: BookObj[], options: Options): [Product[], string[], s
             pages: book.pages,
             format: book.format,
             categories: _categories,
+            languages: generateRandomLanguageSet()
         }
 
         if (processed_book.categories.length == 0) continue;
@@ -91,6 +109,17 @@ async function main() {
         category_id_map[category] = result.id;
     }
 
+    const language_id_map: { [key: string]: number } = {};
+
+    for (const language of languages) {
+        const result = await client.language.create({
+            data: {
+                name: language
+            }
+        });
+        language_id_map[language] = result.id;
+    }
+
     for (const product of products) {
         const { book } = product;
         try {
@@ -103,6 +132,9 @@ async function main() {
                     format: book.format,
                     categories: {
                         connect: book.categories.map(category => ({ id: category_id_map[category] }))
+                    },
+                    languages: {
+                        connect: book.languages.map(language => ({ id: language_id_map[language] }))
                     }
                 }
             });

@@ -28,12 +28,19 @@ model Book {
   format     String
   categories Category[] @relation("BookToCategory")
   product    Product?
+  languages  Language[] @relation("BookToLanguage")
 }
 
 model Category {
   id    Int    @id @default(autoincrement())
   name  String
   books Book[] @relation("BookToCategory")
+}
+
+model Language {
+  id    Int    @id @default(autoincrement())
+  name  String
+  books Book[] @relation("BookToLanguage")
 }
 
 // model Review {
