@@ -1,15 +1,15 @@
-import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
-import { FETCH_CATEGORIES, FETCH_PRODUCTS } from "./queries";
-import { CategoriesSchema, PaginatedProductSchema } from "./schema";
+import { ApolloClient, InMemoryCache } from "@apollo/client";
+import { FETCH_FILTERS, FETCH_PRODUCTS } from "./queries";
+import { FiltersSchema, PaginatedProductSchema } from "./schema";
 
 export const client = new ApolloClient({
     uri: 'http://localhost:8080/graphql',
     cache: new InMemoryCache(),
 });
 
-async function fetchCategories() {
-    return await client.query<CategoriesSchema>({
-        query: FETCH_CATEGORIES,
+async function fetchFilters() {
+    return await client.query<FiltersSchema>({
+        query: FETCH_FILTERS,
     })
 }
 
@@ -33,7 +33,7 @@ async function fetchProducts({ page, itemsPerPage, search, category, sortBy }: S
 }
 
 const catalog = {
-    fetchCategories,
+    fetchFilters,
     fetchProducts
 }
 

@@ -1,4 +1,4 @@
-import { Category } from "./filters";
+import { Category, Language } from "./filters";
 import { Product } from "./product";
 
 export interface Book {
@@ -9,5 +9,6 @@ export interface Book {
     pages?: number;
     format?: string;
     categories: Category[];
-    product?: Product
+    product?: Product;
+    languages?: Language[];
 }

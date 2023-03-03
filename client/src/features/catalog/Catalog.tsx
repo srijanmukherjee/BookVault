@@ -4,11 +4,7 @@ import CatalogHeader from "./CatalogHeader";
 import CatalogList from "./CatalogList";
 import CatalogFilters from "./filters/CatalogFilters";
 import { useAppDispatch, useAppSelector } from "../../app/store";
-import {
-	fetchCategories,
-	fetchProducts,
-	setProductParams,
-} from "./catalogSlice";
+import { fetchFilters, fetchProducts, setProductParams } from "./catalogSlice";
 
 export default function Catalog() {
 	const dispatch = useAppDispatch();
@@ -17,7 +13,7 @@ export default function Catalog() {
 	);
 
 	useEffect(() => {
-		Promise.all([dispatch(fetchProducts()), dispatch(fetchCategories())]);
+		Promise.all([dispatch(fetchProducts()), dispatch(fetchFilters())]);
 	}, [dispatch]);
 
 	useEffect(() => {

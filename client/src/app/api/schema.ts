@@ -1,8 +1,13 @@
-import { Category } from "../models/filters";
+import { Category, Language } from "../models/filters";
 import { Product } from "../models/product";
 
 export interface CategoriesSchema {
     categories: Category[]
+}
+
+export interface FiltersSchema {
+    categories: Category[];
+    languages: Language[];
 }
 
 export interface ProductsSchema {

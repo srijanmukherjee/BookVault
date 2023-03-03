@@ -7,12 +7,14 @@ import {
 	Rating,
 	Box,
 	useTheme,
+	Chip,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import Image from "mui-image";
+import { Product } from "../../app/models/product";
 
 interface Props {
-	product: any;
+	product: Product;
 }
 
 export default function CatalogListItem({ product }: Props) {
@@ -25,8 +27,8 @@ export default function CatalogListItem({ product }: Props) {
 					width: "248px",
 				}}>
 				<Image
-					src={product.book.image}
-					alt={product.book.name}
+					src={product.book?.image!}
+					alt={product.book?.name!}
 					width="100%"
 					height="100%"
 					style={{
@@ -74,25 +76,30 @@ export default function CatalogListItem({ product }: Props) {
 						textDecoration: "none",
 						"&:hover": { color: "warning.light" },
 					}}>
-					{product.book.name}
+					{product.book?.name}
 				</Typography>
 				<Typography variant="body1" mb={1} mt={1}>
 					{"By "}
-					{product.book.author}
+					{product.book!.author}
 				</Typography>
 				<Box display="flex" alignItems="center" mb={2}>
 					<Typography component="span" mr={1} mt="3px">
-						{product.rating.toFixed(1)}
+						{product.rating?.toFixed(1)}
 					</Typography>
 					<Rating
 						name="read-only"
-						value={parseFloat(product.rating.toFixed(1))}
+						value={parseFloat(product.rating!.toFixed(1))}
 						readOnly
 						size="small"
 						precision={0.5}
 					/>
 				</Box>
-				<Box display="flex">
+				<Box display="flex" alignItems="center" mb={2}>
+					<Typography mr={1} variant="h5" color="primary">
+						{product.book!.format}
+					</Typography>
+				</Box>
+				<Box display="flex" mb={2}>
 					<Typography
 						fontSize="1.8em"
 						sx={{
@@ -107,11 +114,24 @@ export default function CatalogListItem({ product }: Props) {
 							fontSize: "2.8em",
 							display: "flex",
 						}}>
-						{(product.price / 100)
+						{(product.price! / 100)
 							.toFixed(0)
 							.toString()
 							.replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}
 					</Typography>
+				</Box>
+				<Box display="flex" alignItems="center">
+					<Typography mr={1}>Languages: </Typography>
+					<Box display="flex" gap="10px">
+						{product.book!.languages?.map(({ name }, index) => (
+							<Chip
+								color="primary"
+								size="small"
+								label={name}
+								key={index}
+							/>
+						))}
+					</Box>
 				</Box>
 			</ListItemText>
 		</ListItem>

@@ -49,7 +49,7 @@ function renderCategory(
 export default function CatalogFilters({}: Props) {
 	const [categoriesMore, setCategoriesMore] = useState(false);
 	const { filters, status } = useAppSelector((state) => state.catalog);
-	const { data: categories, state } = filters.categories;
+	const { categories, languages, status: filterStatus } = filters;
 	const dispatch = useAppDispatch();
 
 	const handleCategoryClick = (category: any) => {
@@ -61,7 +61,7 @@ export default function CatalogFilters({}: Props) {
 			<List aria-labelledby="filters-list">
 				<CollapsableFilter
 					label="Category"
-					loading={state === "loading"}>
+					loading={filterStatus === "loading"}>
 					{categories
 						.slice(0, CATEGORY_COUNT)
 						.map((category, index) =>
@@ -102,20 +102,27 @@ export default function CatalogFilters({}: Props) {
 					</FormGroup>
 				</CollapsableFilter>
 
-				<CollapsableFilter label="Language">
+				<CollapsableFilter
+					label="Language"
+					loading={filterStatus === "loading"}>
 					<FormGroup>
-						<FormControlLabel
-							control={<Checkbox />}
-							label="English"
-						/>
-						<FormControlLabel
-							control={<Checkbox />}
-							label="German"
-						/>
-						<FormControlLabel
-							control={<Checkbox />}
-							label="French"
-						/>
+						{/* {
+							languages.map(({name, id}) => (
+								<FormControlLabel
+									control={<Checkbox />}
+									label={name}
+									key={id}
+								/>
+
+							)
+						} */}
+						{languages.map((language) => (
+							<FormControlLabel
+								control={<Checkbox />}
+								label={language.name}
+								key={language.id}
+							/>
+						))}
 					</FormGroup>
 				</CollapsableFilter>
 

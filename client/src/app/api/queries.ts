@@ -9,6 +9,20 @@ export const FETCH_CATEGORIES = gql`
     }
 `
 
+export const FETCH_FILTERS = gql`
+    query FetchFilters {
+        categories {
+            id
+            name
+        }
+
+        languages {
+            id
+            name
+        }
+    } 
+`
+
 export const FETCH_PRODUCTS = gql`
     query FetchProducts($page: Int!, $itemsPerPage: Int!, $search: String, $category: Int, $sortBy: ProductSortingOption) {
         products(page: $page, itemsPerPage: $itemsPerPage, search: $search, category: $category, sortBy: $sortBy) {
@@ -19,6 +33,9 @@ export const FETCH_PRODUCTS = gql`
                     author
                     image
                     format
+                    languages {
+                        name
+                    }
                 }
                 price
                 discount

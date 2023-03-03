@@ -56,12 +56,7 @@ export default function CatalogList() {
 					} else {
 						return (
 							<Fragment key={index}>
-								<CatalogListItem
-									product={{
-										...product,
-										sponsored: index < 2,
-									}}
-								/>{" "}
+								<CatalogListItem product={product} />{" "}
 								{index < products.length - 1 && (
 									<Divider
 										variant="fullWidth"

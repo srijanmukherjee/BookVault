@@ -8,5 +8,5 @@ export interface Product {
     price?: number;
     discount?: number;
     featured?: boolean;
-    rating?: boolean;
+    rating?: number;
 }

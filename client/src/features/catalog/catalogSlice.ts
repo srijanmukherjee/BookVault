@@ -1,16 +1,10 @@
 import { createAsyncThunk, createEntityAdapter, createSlice } from "@reduxjs/toolkit";
-import { Category } from "../../app/models/filters";
+import { Category, Language } from "../../app/models/filters";
 import { SearchParams, SortingOptions, requests } from "../../app/api/agent";
 import { Product } from "../../app/models/product";
 import { PaginatedProductSchema } from "../../app/api/schema";
 import { RootState } from "../../app/store";
 import _ from "lodash";
-
-interface CategoryFilter {
-    data: Category[];
-    state: 'idle' | 'loading';
-    loaded: boolean;
-}
 
 interface Pagination {
     currentPage: number;
@@ -18,11 +12,19 @@ interface Pagination {
     itemCount: number;
     itemsPerPage: number;
 }
-interface CatalogState {
-    filters: {
-        categories: CategoryFilter
-    },
 
+interface Filters {
+    categories: Category[];
+    languages: Language[];
+}
+
+interface FilterState extends Filters {
+    status: 'idle' | 'loading';
+    loaded: boolean;
+}
+
+interface CatalogState {
+    filters: FilterState;
     status: 'idle' | 'loading' | 'products-loading';
     loaded: boolean;
     pagination: Pagination;
@@ -31,11 +33,10 @@ interface CatalogState {
 
 const initialState: CatalogState = {
     filters: {
-        categories: {
-            data: [],
-            state: 'idle',
-            loaded: false,
-        }
+        categories: [],
+        languages: [],
+        loaded: false,
+        status: 'idle'
     },
 
     status: 'idle',
@@ -55,12 +56,12 @@ const initialState: CatalogState = {
 
 const productAdapter = createEntityAdapter<Product>();
 
-export const fetchCategories = createAsyncThunk<Category[], void, { state: RootState }>(
-    'catalog/filter/fetchCategories',
+export const fetchFilters = createAsyncThunk<Filters, void, { state: RootState }>(
+    'catalog/fetchFilters',
     async (_, thunkAPI) => {
         try {
-            const { data } = await requests.catalog.fetchCategories();
-            return data.categories;
+            const { data } = await requests.catalog.fetchFilters();
+            return data;
         } catch (error) {
             console.error(error);
             return thunkAPI.rejectWithValue({ error: "something went wrong" })
@@ -69,7 +70,7 @@ export const fetchCategories = createAsyncThunk<Category[], void, { state: RootS
     {
         condition: (arg, { getState }) => {
             const { catalog } = getState();
-            return !catalog.filters.categories.loaded;
+            return !catalog.filters.loaded;
         }
     }
 )
@@ -107,18 +108,18 @@ export const catalogSlice = createSlice({
         }
     },
     extraReducers: builder => {
-        builder.addCase(fetchCategories.pending, (state, action) => {
-            state.filters.categories.state = 'loading';
+        builder.addCase(fetchFilters.pending, (state, action) => {
+            state.filters.status = 'loading';
         })
 
-        builder.addCase(fetchCategories.fulfilled, (state, action) => {
-            state.filters.categories.data = action.payload;
-            state.filters.categories.state = 'idle';
-            state.filters.categories.loaded = true;
+        builder.addCase(fetchFilters.fulfilled, (state, action) => {
+            state.filters = { ...state.filters, ...action.payload };
+            state.filters.status = 'idle';
+            state.filters.loaded = true;
         });
 
-        builder.addCase(fetchCategories.rejected, (state, action) => {
-            state.filters.categories.state = 'idle';
+        builder.addCase(fetchFilters.rejected, (state, action) => {
+            state.filters.status = 'idle';
             console.log(action.payload);
         })
 
