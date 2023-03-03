@@ -17,6 +17,66 @@ interface Props {
 	product: Product;
 }
 
+function ProductPrice({ product }: Props) {
+	const { price, discount } = product;
+	if (!price) return null;
+
+	const discountedPrice = discount ? price * (1 - discount / 100) : price;
+
+	return (
+		<Box display="flex" mb={2} alignItems="center">
+			<Typography
+				fontSize="1.8em"
+				sx={{
+					mr: "4px",
+				}}>
+				₹
+			</Typography>
+			{discount && discountedPrice != price ? (
+				<Typography
+					sx={{
+						fontWeight: 300,
+						fontSize: "2.8em",
+						display: "flex",
+						mr: 2,
+					}}>
+					{(discountedPrice / 100)
+						.toFixed(0)
+						.toString()
+						.replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}
+				</Typography>
+			) : null}
+			<Typography
+				sx={{
+					fontWeight: 300,
+					fontSize:
+						discount && discountedPrice != price ? "2em" : "2.8em",
+					display: "flex",
+					textDecoration:
+						discount && discountedPrice != price
+							? "line-through"
+							: "",
+					mr: 2,
+				}}>
+				{(price / 100)
+					.toFixed(0)
+					.toString()
+					.replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}
+			</Typography>
+			{discount && discountedPrice != price ? (
+				<Typography
+					sx={{
+						fontWeight: 300,
+						fontSize: "1.5em",
+						display: "flex",
+					}}>
+					({discount}% off)
+				</Typography>
+			) : null}
+		</Box>
+	);
+}
+
 export default function CatalogListItem({ product }: Props) {
 	const theme = useTheme();
 
@@ -99,27 +159,7 @@ export default function CatalogListItem({ product }: Props) {
 						{product.book!.format}
 					</Typography>
 				</Box>
-				<Box display="flex" mb={2}>
-					<Typography
-						fontSize="1.8em"
-						sx={{
-							mr: "4px",
-							mt: "8px",
-						}}>
-						₹
-					</Typography>
-					<Typography
-						sx={{
-							fontWeight: 300,
-							fontSize: "2.8em",
-							display: "flex",
-						}}>
-						{(product.price! / 100)
-							.toFixed(0)
-							.toString()
-							.replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}
-					</Typography>
-				</Box>
+				<ProductPrice product={product} />
 				<Box display="flex" alignItems="center">
 					<Typography mr={1}>Languages: </Typography>
 					<Box display="flex" gap="10px">
