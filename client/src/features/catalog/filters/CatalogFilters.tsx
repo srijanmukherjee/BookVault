@@ -56,6 +56,7 @@ export default function CatalogFilters({}: Props) {
 	const { categories, status: filterStatus, languages } = filters;
 	const dispatch = useAppDispatch();
 	const [selectedLanguages, setSelectedLanguages] = useState<boolean[]>([]);
+	const [selectedRating, setSelectedRating] = useState(0);
 
 	const handleCategoryClick = (category: any) => {
 		dispatch(setProductParams({ category: parseInt(category) }));
@@ -77,6 +78,20 @@ export default function CatalogFilters({}: Props) {
 		},
 		FILTER_CHANGE_DEBOUNCE_TIME
 	);
+
+	const applyRating = debounce((rating: number | null) => {
+		dispatch(setProductParams({ rating }));
+	}, FILTER_CHANGE_DEBOUNCE_TIME);
+
+	const handleRatingFilter = (rating: number) => {
+		if (rating == selectedRating) {
+			setSelectedRating(0);
+			applyRating(null);
+		} else {
+			setSelectedRating(rating);
+			applyRating(rating);
+		}
+	};
 
 	useEffect(() => {
 		if (languages.length === 0) return;
@@ -204,14 +219,23 @@ export default function CatalogFilters({}: Props) {
 							sx={{
 								color: "text.primary",
 								textDecoration: "none",
-								fontSize: "small",
+								fontSize:
+									selectedRating === rating
+										? "medium"
+										: "small",
 								"&:hover": {
 									color: "warning.light",
 								},
 								mt: 1,
-							}}>
+								my: selectedRating === rating ? "7px" : "5px",
+							}}
+							onClick={() => handleRatingFilter(rating)}>
 							<Rating
-								size="small"
+								size={
+									selectedRating === rating
+										? "medium"
+										: "small"
+								}
 								value={rating}
 								sx={{
 									verticalAlign: "middle",
