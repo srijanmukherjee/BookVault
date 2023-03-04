@@ -85,7 +85,7 @@ export default function ProductDetail() {
 					<ProductPrice product={product} />
 					<Box display="flex" gap="10px" mb={2}>
 						<Typography>Genres </Typography>
-						<Box display="flex" gap="6px">
+						<Box display="flex" gap="6px" flexWrap="wrap">
 							{product.book?.categories?.map(
 								({ name }, index) => (
 									<Chip

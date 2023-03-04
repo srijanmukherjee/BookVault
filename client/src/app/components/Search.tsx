@@ -1,8 +1,9 @@
 import { Box, InputBase, alpha, debounce, styled } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import { useMemo, useState } from "react";
+import { KeyboardEventHandler, useEffect, useMemo, useState } from "react";
 import { useAppDispatch } from "../store";
 import { setProductParams } from "../../features/catalog/catalogSlice";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const SEARCH_DEBOUNCE_TIME = 1000;
 
@@ -54,10 +55,17 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 export default function Search() {
 	const dispatch = useAppDispatch();
+	const navigate = useNavigate();
+	const { search } = useLocation();
+	const queryParams = useMemo(() => new URLSearchParams(search), [search]);
 	const [searchText, setSearchText] = useState("");
 	const handleSearch = useMemo(
 		() =>
 			debounce((event: any) => {
+				const query = event.target.value
+					? `?search=${encodeURIComponent(event.target.value)}`
+					: "";
+				navigate(`/catalog${query}`);
 				dispatch(
 					setProductParams({
 						search: event.target.value,
@@ -68,9 +76,34 @@ export default function Search() {
 		[dispatch]
 	);
 
+	const handleKeyboard: KeyboardEventHandler<HTMLDivElement> = (event) => {
+		if (event.key === "Enter" && searchText) {
+			const query = searchText
+				? `?search=${encodeURIComponent(searchText)}`
+				: "";
+			navigate(`/catalog${query}`);
+			dispatch(
+				setProductParams({
+					search: searchText,
+					page: 1,
+				})
+			);
+		}
+	};
+
+	useEffect(() => {
+		const searchQuery = queryParams.get("search");
+
+		if (searchQuery) {
+			setSearchText(decodeURIComponent(searchQuery));
+		}
+	}, [queryParams]);
+
 	return (
 		<Box flexGrow="1" display="flex" justifyContent="flex-end">
-			<SearchBar className={searchText ? "open" : ""}>
+			<SearchBar
+				className={searchText ? "open" : ""}
+				onKeyUp={handleKeyboard}>
 				<SearchIconWrapper>
 					<SearchIcon />
 				</SearchIconWrapper>

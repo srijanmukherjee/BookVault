@@ -1,16 +1,29 @@
 import { Container, Grid, Pagination } from "@mui/material";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import CatalogHeader from "./CatalogHeader";
 import CatalogList from "./CatalogList";
 import CatalogFilters from "./filters/CatalogFilters";
 import { useAppDispatch, useAppSelector } from "../../app/store";
 import { fetchFilters, fetchProducts, setProductParams } from "./catalogSlice";
+import { useLocation } from "react-router-dom";
 
 export default function Catalog() {
+	let { search } = useLocation();
 	const dispatch = useAppDispatch();
 	const { pagination, status, productParams } = useAppSelector(
 		(state) => state.catalog
 	);
+	const queryParams = useMemo(() => new URLSearchParams(search), [search]);
+
+	useEffect(() => {
+		const searchQuery = queryParams.get("search");
+
+		if (searchQuery) {
+			dispatch(
+				setProductParams({ search: decodeURIComponent(searchQuery) })
+			);
+		}
+	}, [dispatch, queryParams]);
 
 	useEffect(() => {
 		Promise.all([dispatch(fetchProducts()), dispatch(fetchFilters())]);
