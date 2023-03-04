@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { ObjectType, Field, Resolver, Query, ID, ArgsType, Int, Args, registerEnumType } from 'type-graphql';
+import { ObjectType, Field, Resolver, Query, ID, ArgsType, Int, Args, registerEnumType, Arg } from 'type-graphql';
 import { client } from '../db';
 import { Book } from './Book.model';
 import { DEFAULT_ITEMS_PER_PAGE, MAX_ITEMS_PER_PAGE } from './constants';
@@ -106,6 +106,25 @@ export class ProductResolver {
         const totalPages = Math.ceil(itemCount / itemsPerPage);
 
         return { data: products, totalPages, currentPage: totalPages == 0 ? -1 : page, itemsPerPage, itemCount };
+    }
+
+    @Query((returns) => Product, { nullable: true })
+    async product(@Arg("slug") slug: string) {
+        return client.product.findFirst({
+            where: {
+                slug: {
+                    equals: slug
+                }
+            },
+            include: {
+                book: {
+                    include: {
+                        categories: true,
+                        languages: true
+                    }
+                }
+            }
+        })
     }
 
     buildQuery(search?: string, category?: number, sortBy?: ProductSortingType, rating?: number, languages?: number[]): any {
