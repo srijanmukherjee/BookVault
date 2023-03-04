@@ -56,7 +56,9 @@ export default function CatalogFilters({}: Props) {
 	const { categories, status: filterStatus, languages } = filters;
 	const dispatch = useAppDispatch();
 	const [selectedLanguages, setSelectedLanguages] = useState<boolean[]>([]);
-	const [selectedRating, setSelectedRating] = useState(0);
+	const [selectedRating, setSelectedRating] = useState(
+		productParams.rating ? productParams.rating : 0
+	);
 
 	const handleCategoryClick = (category: any) => {
 		dispatch(setProductParams({ category: parseInt(category) }));
@@ -141,13 +143,6 @@ export default function CatalogFilters({}: Props) {
 							{categoriesMore ? "Less" : "More"}
 						</Button>
 					)}
-				</CollapsableFilter>
-
-				<CollapsableFilter label="Condition">
-					<FormGroup>
-						<FormControlLabel control={<Checkbox />} label="New" />
-						<FormControlLabel control={<Checkbox />} label="Used" />
-					</FormGroup>
 				</CollapsableFilter>
 
 				<CollapsableFilter
