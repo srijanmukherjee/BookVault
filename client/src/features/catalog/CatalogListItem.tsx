@@ -17,7 +17,7 @@ interface Props {
 	product: Product;
 }
 
-function ProductPrice({ product }: Props) {
+export function ProductPrice({ product }: Props) {
 	const { price, discount } = product;
 	if (!price) return null;
 

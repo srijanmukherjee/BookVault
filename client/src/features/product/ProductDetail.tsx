@@ -15,6 +15,7 @@ import {
 	Typography,
 } from "@mui/material";
 import Image from "mui-image";
+import { ProductPrice } from "../catalog/CatalogListItem";
 
 export default function ProductDetail() {
 	const { slug } = useParams<{ slug: string }>();
@@ -56,15 +57,19 @@ export default function ProductDetail() {
 	return (
 		<Container maxWidth="xl">
 			<Grid container spacing={4} py={4}>
-				<Grid item xs={12} md={4} p="5rem">
+				<Grid
+					item
+					xs={12}
+					md={4}
+					display="flex"
+					alignItems="center"
+					justifyContent="center">
 					<Image
 						src={product.book?.image!}
 						alt={product.book?.name!}
 						width="100%"
-						height="100%"
 						style={{
-							objectFit: "cover",
-							background: "white",
+							objectFit: "contain",
 							borderRadius: "0.5em",
 						}}
 					/>
@@ -77,7 +82,8 @@ export default function ProductDetail() {
 					<Typography variant="h4" mb={2}>
 						{product.book?.author}
 					</Typography>
-					<Box display="flex" gap="10px">
+					<ProductPrice product={product} />
+					<Box display="flex" gap="10px" mb={2}>
 						<Typography>Genres </Typography>
 						<Box display="flex" gap="6px">
 							{product.book?.categories?.map(
@@ -90,6 +96,40 @@ export default function ProductDetail() {
 									/>
 								)
 							)}
+						</Box>
+					</Box>
+					<Box display="flex" gap="10px" mb={2}>
+						<Typography>Format </Typography>
+						<Box display="flex" gap="6px">
+							{[product.book?.format].map((format, index) => (
+								<Chip
+									color="warning"
+									size="small"
+									label={format}
+									key={index}
+								/>
+							))}
+						</Box>
+					</Box>
+					<Box mb={2}>
+						<Typography variant="h6" mb={1}>
+							Description
+						</Typography>
+						<Typography>{product.book?.description}</Typography>
+					</Box>
+					<Box>
+						<Typography variant="h6" mb={1}>
+							Available languages
+						</Typography>
+						<Box display="flex" gap="6px">
+							{product.book?.languages?.map(({ name }, index) => (
+								<Chip
+									color="secondary"
+									size="small"
+									label={name}
+									key={index}
+								/>
+							))}
 						</Box>
 					</Box>
 				</Grid>
