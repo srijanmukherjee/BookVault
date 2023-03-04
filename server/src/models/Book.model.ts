@@ -17,6 +17,9 @@ export class Book {
     author: string
 
     @Field()
+    description: string
+
+    @Field()
     image: string
 
     @Field()
@@ -44,7 +47,7 @@ export class BookResolver {
                 languages: true,
                 categories: true,
                 product: true
-            }
+            },
         })
     }
 }

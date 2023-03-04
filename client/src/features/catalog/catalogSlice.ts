@@ -25,7 +25,7 @@ interface FilterState extends Filters {
 
 interface CatalogState {
     filters: FilterState;
-    status: 'idle' | 'loading' | 'products-loading';
+    status: 'idle' | 'loading' | 'products-loading' | 'product-information-loading';
     loaded: boolean;
     pagination: Pagination;
     productParams: SearchParams;
@@ -55,7 +55,9 @@ const initialState: CatalogState = {
     }
 }
 
-const productAdapter = createEntityAdapter<Product>();
+const productAdapter = createEntityAdapter<Product>({
+    selectId: (product) => product.slug!
+});
 
 export const fetchFilters = createAsyncThunk<Filters, void, { state: RootState }>(
     'catalog/fetchFilters',
@@ -81,7 +83,8 @@ export const fetchProducts = createAsyncThunk<PaginatedProductSchema, void, { st
     async (_, thunkAPI) => {
         try {
             const { catalog } = thunkAPI.getState()
-            const { data } = await requests.catalog.fetchProducts(catalog.productParams);
+            const { error, data } = await requests.catalog.fetchProducts(catalog.productParams);
+            if (error) throw error;
             return data;
         } catch (error: any) {
             return thunkAPI.rejectWithValue({ error: error.toString() });
@@ -91,6 +94,32 @@ export const fetchProducts = createAsyncThunk<PaginatedProductSchema, void, { st
         condition: (arg, { getState }) => {
             const { catalog } = getState();
             return !catalog.loaded;
+        }
+    }
+)
+
+export const fetchProduct = createAsyncThunk<Product, string, { state: RootState }>(
+    'catalog/fetchProduct',
+    async (slug, thunkAPI) => {
+        try {
+            const { error, data } = await requests.catalog.fetchProduct(slug);
+            if (error || !data.product) throw error;
+            return data.product;
+        } catch (error: any) {
+            return thunkAPI.rejectWithValue({ error: error.toString() });
+        }
+    }
+)
+
+export const fetchProductDescriptionCategories = createAsyncThunk<Product, string, { state: RootState }>(
+    'catalog/fetchDescription',
+    async (slug, thunkAPI) => {
+        try {
+            const { data, error } = await requests.catalog.fetchProductDescriptionCategoeries(slug);
+            if (error || !data.product) throw error;
+            return data.product;
+        } catch (error: any) {
+            return thunkAPI.rejectWithValue({ error: error.toString() });
         }
     }
 )
@@ -141,6 +170,42 @@ export const catalogSlice = createSlice({
         builder.addCase(fetchProducts.rejected, (state, action) => {
             state.status = 'idle';
             console.error(action.payload);
+        })
+
+        builder.addCase(fetchProduct.pending, (state, action) => {
+            state.status = 'products-loading'
+        })
+
+        builder.addCase(fetchProduct.fulfilled, (state, action) => {
+            productAdapter.upsertOne(state, action.payload);
+            state.status = 'idle';
+        });
+
+        builder.addCase(fetchProduct.rejected, (state, action) => {
+            state.status = 'idle'
+        })
+
+        builder.addCase(fetchProductDescriptionCategories.pending, (state, action) => {
+            state.status = 'product-information-loading'
+        })
+
+        builder.addCase(fetchProductDescriptionCategories.fulfilled, (state, action) => {
+            const product = productSelectors.selectById({ catalog: state }, action.meta.arg);
+            productAdapter.updateOne(state, {
+                id: action.meta.arg,
+                changes: {
+                    book: {
+                        ...product?.book!,
+                        description: action.payload.book?.description,
+                        categories: action.payload.book?.categories
+                    }
+                }
+            });
+            state.status = 'idle';
+        });
+
+        builder.addCase(fetchProductDescriptionCategories.rejected, (state, action) => {
+            state.status = 'idle'
         })
     }
 })

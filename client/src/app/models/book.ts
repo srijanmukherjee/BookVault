@@ -8,7 +8,8 @@ export interface Book {
     image: string;
     pages?: number;
     format?: string;
-    categories: Category[];
+    categories?: Category[];
     product?: Product;
     languages?: Language[];
+    description?: string;
 }

@@ -15,7 +15,8 @@ interface BookObj {
     image: string;
     pages: number;
     format: string;
-    genres: string[]
+    genres: string[];
+    description: string;
 }
 
 interface ProcessedBook {
@@ -26,6 +27,7 @@ interface ProcessedBook {
     format: string;
     categories: string[];
     languages: string[];
+    description: string;
 }
 
 interface Product {
@@ -58,7 +60,7 @@ function preprocess(books: BookObj[], options: Options): [Product[], string[], s
     const formats: Set<string> = new Set<string>();
 
     for (const book of books) {
-        if (options.exclude?.format?.includes(book.format) || !book.pages || !book.format || book.genres.length == 0 || !book.title || !book.author) continue;
+        if (options.exclude?.format?.includes(book.format) || !book.pages || !book.format || book.genres.length == 0 || !book.title || !book.author || !book.description || book.description.length < 100) continue;
 
         const _categories = book.genres.filter((cat) => !options.exclude?.category?.includes(cat));
         _categories.forEach((cat) => categories.add(cat));
@@ -70,6 +72,7 @@ function preprocess(books: BookObj[], options: Options): [Product[], string[], s
             pages: book.pages,
             format: book.format,
             categories: _categories,
+            description: book.description,
             languages: generateRandomLanguageSet()
         }
 
@@ -129,6 +132,7 @@ async function main() {
                     image: book.image,
                     pages: book.pages,
                     format: book.format,
+                    description: book.description,
                     categories: {
                         connect: book.categories.map(category => ({ id: category_id_map[category] }))
                     },

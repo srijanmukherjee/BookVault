@@ -1,6 +1,6 @@
 import { ApolloClient, InMemoryCache } from "@apollo/client";
-import { FETCH_FILTERS, FETCH_PRODUCTS } from "./queries";
-import { FiltersSchema, PaginatedProductSchema } from "./schema";
+import { FETCH_FILTERS, FETCH_PRODUCT, FETCH_PRODUCTS, FETCH_PRODUCT_DESCRIPTION as FETCH_PRODUCT_DESCRIPTION_CATEGORIES } from "./queries";
+import { FiltersSchema, PaginatedProductSchema, ProductSchema } from "./schema";
 
 export const client = new ApolloClient({
     uri: 'http://localhost:8080/graphql',
@@ -34,9 +34,30 @@ async function fetchProducts({ page, itemsPerPage, search, category, sortBy, lan
     })
 }
 
+async function fetchProduct(slug: string) {
+    return await client.query<ProductSchema>({
+        query: FETCH_PRODUCT,
+        variables: {
+            slug
+        }
+    })
+}
+
+async function fetchProductDescriptionCategoeries(slug: string) {
+    return await client.query<ProductSchema>({
+        query: FETCH_PRODUCT_DESCRIPTION_CATEGORIES,
+        variables: {
+            slug
+        }
+    })
+}
+
+
 const catalog = {
     fetchFilters,
-    fetchProducts
+    fetchProducts,
+    fetchProduct,
+    fetchProductDescriptionCategoeries
 }
 
 export const requests = {

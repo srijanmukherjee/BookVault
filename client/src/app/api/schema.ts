@@ -16,6 +16,10 @@ export interface ProductsSchema {
     }
 }
 
+export interface ProductSchema {
+    product: Product
+}
+
 export interface PaginatedProductSchema extends ProductsSchema {
     products: {
         data: Product[],

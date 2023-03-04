@@ -20,15 +20,16 @@ model Product {
 }
 
 model Book {
-  id         Int        @id @default(autoincrement())
-  name       String
-  author     String
-  image      String
-  pages      Int
-  format     String
-  categories Category[] @relation("BookToCategory")
-  product    Product?
-  languages  Language[] @relation("BookToLanguage")
+  id          Int        @id @default(autoincrement())
+  name        String
+  author      String
+  image       String
+  pages       Int
+  format      String
+  description String
+  categories  Category[] @relation("BookToCategory")
+  product     Product?
+  languages   Language[] @relation("BookToLanguage")
 }
 
 model Category {

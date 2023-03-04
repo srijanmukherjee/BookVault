@@ -29,6 +29,7 @@ export const FETCH_PRODUCTS = gql`
             data {
                 id
                 book {
+                    id
                     name
                     author
                     image
@@ -48,6 +49,51 @@ export const FETCH_PRODUCTS = gql`
             currentPage
             itemsPerPage
             itemCount
+        }
+    }
+`
+
+export const FETCH_PRODUCT = gql`
+    query FetchProduct($slug: String!) {
+        product(slug: $slug) {
+            id
+            price
+            discount
+            featured
+            rating
+            slug
+            book {
+                id
+                name
+                author
+                image
+                format
+                languages {
+                    name
+                    id
+                }
+                categories {
+                    name
+                    id
+                }
+                description
+            }
+        }
+    }
+`
+
+export const FETCH_PRODUCT_DESCRIPTION = gql`
+    query FetchProductDescription($slug: String!) {
+        product(slug: $slug) {
+            id
+            book {
+                id
+                description
+                categories {
+                    id
+                    name
+                }
+            }
         }
     }
 `

@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import { Route, Routes } from "react-router-dom";
 import Catalog from "../../features/catalog/Catalog";
+import ProductDetail from "../../features/product/ProductDetail";
 
 const THEME_KEY = "theme";
 
@@ -46,6 +47,7 @@ function App() {
 						}
 					/>
 					<Route path="/catalog" element={<Catalog />} />
+					<Route path="/product/:slug" element={<ProductDetail />} />
 				</Routes>
 			</Box>
 		</ThemeProvider>
