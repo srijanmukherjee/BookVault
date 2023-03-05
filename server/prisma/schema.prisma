@@ -17,6 +17,8 @@ model Product {
   discount Float   @default(0)
   featured Boolean @default(false)
   rating   Float   @default(0)
+
+  basketItems BasketItem[]
 }
 
 model Book {
@@ -42,6 +44,21 @@ model Language {
   id    Int    @id @default(autoincrement())
   name  String
   books Book[] @relation("BookToLanguage")
+}
+
+model BasketItem {
+  id        Int     @id @default(autoincrement())
+  product   Product @relation(references: [id], fields: [productId])
+  productId Int
+  quantity  Int     @default(1)
+  basket    Basket  @relation(references: [id], fields: [basketId])
+  basketId  String
+}
+
+model Basket {
+  id          String       @id
+  basketItems BasketItem[]
+  lastUpdate  DateTime     @updatedAt
 }
 
 // model Review {
