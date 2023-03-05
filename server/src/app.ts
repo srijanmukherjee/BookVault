@@ -7,6 +7,8 @@ import { CategoryResolver } from './models/Category.model';
 import { ProductResolver } from './models/Product.model';
 import cors from 'cors';
 import { LanguageResolver } from './models/Language.model';
+import { BasketResolver } from './models/Basket.model';
+import cookieParser from 'cookie-parser';
 
 dotenv.config();
 
@@ -18,16 +20,21 @@ app.use(cors({
 }))
 
 const schema = buildSchemaSync({
-  resolvers: [BookResolver, CategoryResolver, ProductResolver, LanguageResolver],
+  resolvers: [BookResolver, CategoryResolver, ProductResolver, LanguageResolver, BasketResolver],
 })
+
+app.use(cookieParser())
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Express + TypeScript Server');
 });
 
-app.use('/graphql', graphqlHTTP({
-  schema,
-  graphiql: true,
+app.use('/graphql', graphqlHTTP((req, res) => {
+  return {
+    schema,
+    graphiql: true,
+    context: { req, res }
+  }
 }));
 
 app.listen(port, () => {

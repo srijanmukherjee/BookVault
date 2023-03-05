@@ -53,6 +53,8 @@ model BasketItem {
   quantity  Int     @default(1)
   basket    Basket  @relation(references: [id], fields: [basketId])
   basketId  String
+
+  @@unique([basketId, productId])
 }
 
 model Basket {
