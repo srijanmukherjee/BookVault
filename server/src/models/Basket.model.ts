@@ -1,8 +1,8 @@
 import 'reflect-metadata';
-import { ObjectType, Field, Resolver, Query, ID, Args, ArgsType, Arg, Ctx, UseMiddleware, Mutation } from 'type-graphql';
+import { ObjectType, Field, Resolver, Query, ID, Arg, Ctx, UseMiddleware, Mutation } from 'type-graphql';
 import { client } from '../db';
 import { BasketItem } from './BasketItem.model';
-import { BASKET_COOKIE, BasketInterceptor, Context } from './middleware/BasketMiddleware';
+import { BasketInterceptor, BasketLastUpdate, Context } from './middleware/BasketMiddleware';
 import { Prisma } from '@prisma/client';
 
 @ObjectType("Basket")
@@ -22,7 +22,7 @@ export class BasketResolver {
     @Query((returns) => Basket, { nullable: true })
     @UseMiddleware(BasketInterceptor)
     async basket(@Ctx() context: Context) {
-        const basketId = context.req.cookies[BASKET_COOKIE];
+        const basketId = context.basket!.id;
         return client.basket.findFirst({
             where: {
                 id: basketId
@@ -43,17 +43,21 @@ export class BasketResolver {
 
     @Mutation(type => BasketItem, { nullable: true })
     @UseMiddleware(BasketInterceptor)
+    @UseMiddleware(BasketLastUpdate)
     async addBasketItem(@Arg("productId") productId: number, @Arg("quantity", { defaultValue: 1 }) quantity: number, @Ctx() context: Context) {
-        const basketId = context.req.cookies[BASKET_COOKIE];
-        const basketItem = await client.basketItem.findFirst({
+        const basketId = context.basket!.id;
+        const basketItem = context.basket!.basketItems.find((item) => item.productId === productId);
+        const product = await client.product.findFirst({
             where: {
-                basketId, productId
+                id: productId
             }
         });
 
+        if (product == null) throw new Error("Product not found");
+
         if (!basketItem) {
 
-            if (quantity < 0) return null;
+            if (quantity <= 0) throw new Error("quantity must be positive");
 
             return await client.basketItem.create({
                 data: {
@@ -77,7 +81,6 @@ export class BasketResolver {
                     }
                 }
             });
-
         }
 
         else {
@@ -99,6 +102,13 @@ export class BasketResolver {
                 },
                 where: {
                     id: basketItem.id
+                },
+                include: {
+                    product: {
+                        include: {
+                            book: true
+                        }
+                    }
                 }
             });
         }
@@ -106,40 +116,27 @@ export class BasketResolver {
 
     @Mutation(type => Basket)
     @UseMiddleware(BasketInterceptor)
+    @UseMiddleware(BasketLastUpdate)
     async removeBasketItem(@Arg("productId") productId: number, @Ctx() context: Context) {
-        const basketId = context.req.cookies[BASKET_COOKIE];
+        const basketId = context.basket!.id;
         try {
-
-            const [removedItem, basket] = await client.$transaction([
-                client.basketItem.delete({
-                    where: {
-                        basketId_productId: {
-                            basketId, productId
-                        },
-                    }
-                }),
-                client.basket.findFirst({
-                    where: {
-                        id: basketId,
+            await client.basketItem.delete({
+                where: {
+                    basketId_productId: {
+                        basketId, productId
                     },
-                    include: {
-                        basketItems: {
-                            include: {
-                                product: {
-                                    include: {
-                                        book: true
-                                    }
-                                }
-                            }
-                        }
-                    }
-                })
-            ]);
-            return basket
-        } catch (e) {
+                }
+            })
+
+            context.basket!.basketItems = context.basket!.basketItems.filter((item) => item.productId != productId);
+            return context.basket!;
+        } catch (e: any) {
             if (e instanceof Prisma.PrismaClientKnownRequestError) {
-                throw { error: "Basket item not found" }
+                throw new Error("Basket item not found")
             }
+
+            console.trace(e);
+            throw new Error("Something went wrong, check logs");
         }
     }
 }

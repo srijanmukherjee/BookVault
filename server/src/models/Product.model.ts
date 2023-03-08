@@ -12,7 +12,7 @@ export class Product {
     id: number
 
     @Field(type => Book)
-    book: Book
+    book?: Book
 
     @Field(type => Int)
     bookId: number

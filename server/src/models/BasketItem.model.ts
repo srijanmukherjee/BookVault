@@ -17,7 +17,7 @@ export class BasketItem {
     quantity: number
 
     @Field(type => Basket)
-    basket: Basket
+    basket?: Basket
 
     @Field()
     basketId: string
