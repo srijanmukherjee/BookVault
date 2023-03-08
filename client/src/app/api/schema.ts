@@ -1,3 +1,4 @@
+import Basket from "../models/basket";
 import { Category, Language } from "../models/filters";
 import { Product } from "../models/product";
 
@@ -28,4 +29,8 @@ export interface PaginatedProductSchema extends ProductsSchema {
         itemsPerPage: number,
         itemCount: number
     }
+}
+
+export interface BasketSchema {
+    basket: Basket
 }

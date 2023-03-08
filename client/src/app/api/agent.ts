@@ -1,6 +1,6 @@
 import { ApolloClient, InMemoryCache } from "@apollo/client";
-import { FETCH_FILTERS, FETCH_PRODUCT, FETCH_PRODUCTS, FETCH_PRODUCT_DESCRIPTION as FETCH_PRODUCT_DESCRIPTION_CATEGORIES } from "./queries";
-import { FiltersSchema, PaginatedProductSchema, ProductSchema } from "./schema";
+import { FETCH_BASKET, FETCH_FILTERS, FETCH_PRODUCT, FETCH_PRODUCTS, FETCH_PRODUCT_DESCRIPTION as FETCH_PRODUCT_DESCRIPTION_CATEGORIES } from "./queries";
+import { BasketSchema, FiltersSchema, PaginatedProductSchema, ProductSchema } from "./schema";
 
 export const client = new ApolloClient({
     uri: 'http://localhost:8080/graphql',
@@ -52,6 +52,11 @@ async function fetchProductDescriptionCategoeries(slug: string) {
     })
 }
 
+async function fetchBasket() {
+    return await client.query<BasketSchema>({
+        query: FETCH_BASKET
+    })
+}
 
 const catalog = {
     fetchFilters,
@@ -60,6 +65,10 @@ const catalog = {
     fetchProductDescriptionCategoeries
 }
 
+const basket = {
+    fetch: fetchBasket
+}
+
 export const requests = {
-    catalog
+    catalog, basket
 }

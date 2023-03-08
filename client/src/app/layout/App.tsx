@@ -11,10 +11,13 @@ import {
 import { Route, Routes } from "react-router-dom";
 import Catalog from "../../features/catalog/Catalog";
 import ProductDetail from "../../features/product/ProductDetail";
+import { fetchBasket } from "../../features/basket/basketSlice";
+import { useAppDispatch } from "../store";
 
 const THEME_KEY = "theme";
 
 function App() {
+	const dispatch = useAppDispatch();
 	const [darkTheme, setDarkTheme] = useState(
 		localStorage.getItem(THEME_KEY) === "dark"
 	);
@@ -28,6 +31,10 @@ function App() {
 	useEffect(() => {
 		localStorage.setItem(THEME_KEY, theme.palette.mode);
 	}, [theme]);
+
+	useEffect(() => {
+		dispatch(fetchBasket());
+	}, [dispatch]);
 
 	return (
 		<ThemeProvider theme={theme}>

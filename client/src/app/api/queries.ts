@@ -97,3 +97,26 @@ export const FETCH_PRODUCT_DESCRIPTION = gql`
         }
     }
 `
+
+export const FETCH_BASKET = gql`
+    query FetchBasket {
+        basket {
+            id,
+            basketItems {
+                id
+                product {
+                    id
+                    book {
+                        id
+                        name
+                        format
+                    }
+                    price
+                    discount
+                }
+                quantity
+            }
+            lastUpdate
+        }
+    }
+`

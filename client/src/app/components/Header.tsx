@@ -5,11 +5,17 @@ import {
 	Typography,
 	Box,
 	Button,
+	Badge,
+	IconButton,
+	CircularProgress,
 } from "@mui/material";
 import AdbIcon from "@mui/icons-material/Adb";
 import ThemeToggleButton from "./ThemeToggleButton";
 import Search from "./Search";
 import { Link } from "react-router-dom";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import { useAppSelector } from "../store";
+import { LoadingButton } from "@mui/lab";
 
 const links = [{ label: "Browse", to: "/catalog" }];
 
@@ -19,6 +25,12 @@ interface Props {
 }
 
 export default function Header({ theme, onThemeToggle }: Props) {
+	const { basket, status: basketStatus } = useAppSelector(
+		(state) => state.basket
+	);
+	const itemCount =
+		basket?.basketItems.reduce((val, item) => val + item.quantity, 0) ?? 0;
+
 	return (
 		<AppBar position="static">
 			<Container maxWidth="xl">
@@ -47,6 +59,26 @@ export default function Header({ theme, onThemeToggle }: Props) {
 						justifyContent="flex-end"
 						alignItems="center">
 						<Search />
+						<Box sx={{ ml: 2 }}>
+							{basketStatus === "idle" ? (
+								<IconButton>
+									<Badge
+										badgeContent={itemCount}
+										color={
+											theme === "dark"
+												? "success"
+												: "secondary"
+										}
+										showZero>
+										<ShoppingCartIcon
+											sx={{ color: "white" }}
+										/>
+									</Badge>
+								</IconButton>
+							) : (
+								<CircularProgress color="secondary" size={10} />
+							)}
+						</Box>
 						<Box
 							sx={{
 								display: { xs: "none", md: "flex" },
