@@ -41,7 +41,7 @@ export class BasketResolver {
         })
     }
 
-    @Mutation(type => BasketItem, { nullable: true })
+    @Mutation(type => Basket, { nullable: true })
     @UseMiddleware(BasketInterceptor)
     @UseMiddleware(BasketLastUpdate)
     async addBasketItem(@Arg("productId") productId: number, @Arg("quantity", { defaultValue: 1 }) quantity: number, @Ctx() context: Context) {
@@ -59,7 +59,7 @@ export class BasketResolver {
 
             if (quantity <= 0) throw new Error("quantity must be positive");
 
-            return await client.basketItem.create({
+            const item = await client.basketItem.create({
                 data: {
                     product: {
                         connect: {
@@ -81,20 +81,26 @@ export class BasketResolver {
                     }
                 }
             });
+
+            context.basket!.basketItems = [...context.basket!.basketItems, item];
+            return context.basket!;
         }
 
         else {
             const newQuantity = basketItem.quantity + quantity;
 
             if (newQuantity <= 0) {
-                return await client.basketItem.delete({
+                await client.basketItem.delete({
                     where: {
                         id: basketItem.id
                     }
                 });
+
+                context.basket!.basketItems = context.basket!.basketItems.filter((item) => item.id != basketItem.id);
+                return context.basket!;
             }
 
-            return await client.basketItem.update({
+            await client.basketItem.update({
                 data: {
                     quantity: {
                         set: newQuantity
@@ -111,6 +117,13 @@ export class BasketResolver {
                     }
                 }
             });
+
+            const idx = context.basket!.basketItems.findIndex((item) => item.id === basketItem.id);
+            if (idx >= 0) {
+                context.basket!.basketItems[idx].quantity = newQuantity;
+            }
+
+            return context.basket!;
         }
     }
 

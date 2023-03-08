@@ -16,7 +16,7 @@ export class BasketItem {
     @Field()
     quantity: number
 
-    @Field(type => Basket)
+    @Field(type => Basket, { nullable: true })
     basket?: Basket
 
     @Field()

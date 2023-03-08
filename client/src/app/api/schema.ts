@@ -1,4 +1,4 @@
-import Basket from "../models/basket";
+import Basket, { BasketItem } from "../models/basket";
 import { Category, Language } from "../models/filters";
 import { Product } from "../models/product";
 
@@ -33,4 +33,8 @@ export interface PaginatedProductSchema extends ProductsSchema {
 
 export interface BasketSchema {
     basket: Basket
+}
+
+export interface AddBasketItemSchema {
+    addBasketItem: Basket
 }

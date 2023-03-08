@@ -1,9 +1,16 @@
-import { ApolloClient, InMemoryCache } from "@apollo/client";
+import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client";
 import { FETCH_BASKET, FETCH_FILTERS, FETCH_PRODUCT, FETCH_PRODUCTS, FETCH_PRODUCT_DESCRIPTION as FETCH_PRODUCT_DESCRIPTION_CATEGORIES } from "./queries";
-import { BasketSchema, FiltersSchema, PaginatedProductSchema, ProductSchema } from "./schema";
+import { AddBasketItemSchema, BasketSchema, FiltersSchema, PaginatedProductSchema, ProductSchema } from "./schema";
+import { MUTATE_ADD_ITEM } from "./mutations";
+
+
+const link = createHttpLink({
+    uri: 'http://localhost:8080/graphql',
+    credentials: 'include'
+})
 
 export const client = new ApolloClient({
-    uri: 'http://localhost:8080/graphql',
+    link,
     cache: new InMemoryCache(),
 });
 
@@ -58,6 +65,13 @@ async function fetchBasket() {
     })
 }
 
+async function addItemToBasket(productId: number, quantity: number) {
+    return await client.mutate<AddBasketItemSchema>({
+        mutation: MUTATE_ADD_ITEM,
+        variables: { productId: parseInt(productId.toString()), quantity: parseInt(quantity.toString()) }
+    })
+}
+
 const catalog = {
     fetchFilters,
     fetchProducts,
@@ -66,7 +80,8 @@ const catalog = {
 }
 
 const basket = {
-    fetch: fetchBasket
+    fetch: fetchBasket,
+    add: addItemToBasket
 }
 
 export const requests = {

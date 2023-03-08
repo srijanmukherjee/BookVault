@@ -29,10 +29,10 @@ export class Book {
     pages: number
 
     @Field(type => [Language])
-    languages: Language[]
+    languages?: Language[]
 
     @Field(type => [Category])
-    categories: Category[]
+    categories?: Category[]
 
     @Field(type => Product, { nullable: true })
     product?: Product

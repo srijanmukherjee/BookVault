@@ -25,9 +25,11 @@ interface Props {
 }
 
 export default function Header({ theme, onThemeToggle }: Props) {
-	const { basket, status: basketStatus } = useAppSelector(
-		(state) => state.basket
-	);
+	const {
+		basket,
+		status: basketStatus,
+		loaded: basketLoaded,
+	} = useAppSelector((state) => state.basket);
 	const itemCount =
 		basket?.basketItems.reduce((val, item) => val + item.quantity, 0) ?? 0;
 
@@ -60,7 +62,7 @@ export default function Header({ theme, onThemeToggle }: Props) {
 						alignItems="center">
 						<Search />
 						<Box sx={{ ml: 2 }}>
-							{basketStatus === "idle" ? (
+							{basketLoaded ? (
 								<IconButton>
 									<Badge
 										badgeContent={itemCount}

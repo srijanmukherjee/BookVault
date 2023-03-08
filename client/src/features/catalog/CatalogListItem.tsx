@@ -12,6 +12,7 @@ import {
 import { Link } from "react-router-dom";
 import Image from "mui-image";
 import { Product } from "../../app/models/product";
+import ProductCartButton from "../../app/components/ProductCartButton";
 
 interface Props {
 	product: Product;
@@ -85,6 +86,7 @@ export default function CatalogListItem({ product }: Props) {
 			<ListItemAvatar
 				sx={{
 					width: "248px",
+					my: "auto",
 				}}>
 				<Image
 					src={product.book?.image!}
@@ -135,10 +137,11 @@ export default function CatalogListItem({ product }: Props) {
 						color: "text.primary",
 						textDecoration: "none",
 						"&:hover": { color: "warning.light" },
-					}}>
+					}}
+					title="Title">
 					{product.book?.name}
 				</Typography>
-				<Typography variant="body1" mb={1} mt={1}>
+				<Typography variant="body1" mb={1} mt={1} title="Author">
 					{"By "}
 					{product.book!.author}
 				</Typography>
@@ -155,7 +158,11 @@ export default function CatalogListItem({ product }: Props) {
 					/>
 				</Box>
 				<Box display="flex" alignItems="center" mb={2}>
-					<Typography mr={1} variant="h5" color="primary">
+					<Typography
+						mr={1}
+						variant="h5"
+						color="primary"
+						title="Book format">
 						{product.book!.format}
 					</Typography>
 				</Box>
@@ -172,6 +179,9 @@ export default function CatalogListItem({ product }: Props) {
 							/>
 						))}
 					</Box>
+				</Box>
+				<Box my={3}>
+					<ProductCartButton product={product} />
 				</Box>
 			</ListItemText>
 		</ListItem>

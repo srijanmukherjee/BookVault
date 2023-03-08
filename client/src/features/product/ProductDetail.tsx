@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 import Image from "mui-image";
 import { ProductPrice } from "../catalog/CatalogListItem";
+import ProductCartButton from "../../app/components/ProductCartButton";
 
 export default function ProductDetail() {
 	const { slug } = useParams<{ slug: string }>();
@@ -110,6 +111,12 @@ export default function ProductDetail() {
 								/>
 							))}
 						</Box>
+					</Box>
+					<Box mb={2}>
+						<Typography variant="h6" mb={2}>
+							Buying Options
+						</Typography>
+						<ProductCartButton product={product} />
 					</Box>
 					<Box mb={2}>
 						<Typography variant="h6" mb={1}>

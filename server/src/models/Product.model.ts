@@ -11,7 +11,7 @@ export class Product {
     @Field(type => ID)
     id: number
 
-    @Field(type => Book)
+    @Field(type => Book, { nullable: true })
     book?: Book
 
     @Field(type => Int)

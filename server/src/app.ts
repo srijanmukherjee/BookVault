@@ -16,7 +16,8 @@ const app: Express = express();
 const port = process.env.PORT || 8000;
 
 app.use(cors({
-  origin: ['http://localhost:8000']
+  origin: ['http://localhost:8000'],
+  credentials: true
 }))
 
 const schema = buildSchemaSync({
