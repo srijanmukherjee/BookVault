@@ -110,9 +110,11 @@ export const FETCH_BASKET = gql`
                         id
                         name
                         format
+                        image
                     }
                     price
                     discount
+                    slug
                 }
                 quantity
             }

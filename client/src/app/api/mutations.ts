@@ -12,9 +12,11 @@ export const MUTATE_ADD_ITEM = gql`
                         id
                         name
                         format
+                        image
                     }
                     price
                     discount
+                    slug
                 }
                 quantity
             }

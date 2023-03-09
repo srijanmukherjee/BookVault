@@ -13,6 +13,7 @@ import Catalog from "../../features/catalog/Catalog";
 import ProductDetail from "../../features/product/ProductDetail";
 import { fetchBasket } from "../../features/basket/basketSlice";
 import { useAppDispatch } from "../store";
+import Basket from "../../features/basket/Basket";
 
 const THEME_KEY = "theme";
 
@@ -55,6 +56,7 @@ function App() {
 					/>
 					<Route path="/catalog" element={<Catalog />} />
 					<Route path="/product/:slug" element={<ProductDetail />} />
+					<Route path="/cart" element={<Basket />} />
 				</Routes>
 			</Box>
 		</ThemeProvider>

@@ -12,7 +12,7 @@ import {
 import AdbIcon from "@mui/icons-material/Adb";
 import ThemeToggleButton from "./ThemeToggleButton";
 import Search from "./Search";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { useAppSelector } from "../store";
 import { LoadingButton } from "@mui/lab";
@@ -32,6 +32,8 @@ export default function Header({ theme, onThemeToggle }: Props) {
 	} = useAppSelector((state) => state.basket);
 	const itemCount =
 		basket?.basketItems.reduce((val, item) => val + item.quantity, 0) ?? 0;
+
+	const navigate = useNavigate();
 
 	return (
 		<AppBar position="static">
@@ -63,7 +65,7 @@ export default function Header({ theme, onThemeToggle }: Props) {
 						<Search />
 						<Box sx={{ ml: 2 }}>
 							{basketLoaded ? (
-								<IconButton>
+								<IconButton onClick={() => navigate("/cart")}>
 									<Badge
 										badgeContent={itemCount}
 										color={

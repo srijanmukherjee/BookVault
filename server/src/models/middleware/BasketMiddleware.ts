@@ -25,7 +25,11 @@ async function createBasket(): Promise<[string, Basket]> {
         include: {
             basketItems: {
                 include: {
-                    product: true,
+                    product: {
+                        include: {
+                            book: true
+                        }
+                    },
                 },
             }
         }
@@ -42,7 +46,11 @@ async function fetchBasket(basketId: string): Promise<Basket | null> {
         include: {
             basketItems: {
                 include: {
-                    product: true
+                    product: {
+                        include: {
+                            book: true
+                        }
+                    }
                 }
             }
         }
