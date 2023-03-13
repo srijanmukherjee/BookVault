@@ -1,13 +1,8 @@
 import {
+	Box,
 	Button,
+	CircularProgress,
 	Container,
-	Paper,
-	Table,
-	TableBody,
-	TableCell,
-	TableContainer,
-	TableHead,
-	TableRow,
 	Typography,
 	useTheme,
 } from "@mui/material";
@@ -19,6 +14,14 @@ function Basket() {
 	const { status, basket } = useAppSelector((state) => state.basket);
 	const navigate = useNavigate();
 	const theme = useTheme();
+
+	if (status === "loading" && (!basket || basket?.basketItems.length == 0)) {
+		return (
+			<Box display="grid" sx={{ placeItems: "center" }} height="100vh">
+				<CircularProgress size={24} />
+			</Box>
+		);
+	}
 
 	// Show some empty cart message
 	if (!basket || basket.basketItems.length === 0) {

@@ -12,7 +12,7 @@ import { Add, Close, Remove } from "@mui/icons-material";
 import Image from "mui-image";
 import { Link } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/store";
-import { addBasketItem } from "./basketSlice";
+import { addBasketItem, removeBasketItem } from "./basketSlice";
 
 interface Props {
 	item: BasketItemType;
@@ -99,6 +99,9 @@ function BasketItem({ item }: Props) {
 					disabled={
 						status === "loading" &&
 						context?.productId === item.product?.id
+					}
+					onClick={() =>
+						dispatch(removeBasketItem(item.product?.id!))
 					}>
 					<Close />
 				</IconButton>

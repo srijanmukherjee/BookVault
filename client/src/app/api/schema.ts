@@ -38,3 +38,7 @@ export interface BasketSchema {
 export interface AddBasketItemSchema {
     addBasketItem: Basket
 }
+
+export interface RemoveBasketItemSchema {
+    removeBasketItem: Basket
+}

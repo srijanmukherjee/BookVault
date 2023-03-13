@@ -44,6 +44,19 @@ export const addBasketItem = createAsyncThunk<Basket, { productId: number, quant
     }
 )
 
+export const removeBasketItem = createAsyncThunk<Basket, number, { state: RootState }>(
+    'removeBasketItem',
+    async (productId, thunkAPI) => {
+        try {
+            const { data, errors } = await requests.basket.remove(productId);
+            if (errors) throw errors;
+            return data!.removeBasketItem;
+        } catch (e: any) {
+            return thunkAPI.rejectWithValue({ error: e.toString() })
+        }
+    }
+)
+
 export const basketSlice = createSlice({
     name: 'basket',
     initialState,
@@ -77,6 +90,24 @@ export const basketSlice = createSlice({
 
 
         builder.addCase(addBasketItem.rejected, (state, action) => {
+            state.status = 'idle';
+            console.log(action.payload)
+            state.context = undefined;
+        })
+
+        builder.addCase(removeBasketItem.pending, (state, action) => {
+            state.status = 'loading';
+            state.context = { productId: action.meta.arg };
+        })
+
+        builder.addCase(removeBasketItem.fulfilled, (state, action) => {
+            state.status = 'idle';
+            state.context = undefined;
+            state.basket = action.payload;
+        })
+
+
+        builder.addCase(removeBasketItem.rejected, (state, action) => {
             state.status = 'idle';
             console.log(action.payload)
             state.context = undefined;

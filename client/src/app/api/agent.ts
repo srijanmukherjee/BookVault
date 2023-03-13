@@ -1,7 +1,7 @@
 import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client";
 import { FETCH_BASKET, FETCH_FILTERS, FETCH_PRODUCT, FETCH_PRODUCTS, FETCH_PRODUCT_DESCRIPTION as FETCH_PRODUCT_DESCRIPTION_CATEGORIES } from "./queries";
-import { AddBasketItemSchema, BasketSchema, FiltersSchema, PaginatedProductSchema, ProductSchema } from "./schema";
-import { MUTATE_ADD_ITEM } from "./mutations";
+import { AddBasketItemSchema, BasketSchema, FiltersSchema, PaginatedProductSchema, ProductSchema, RemoveBasketItemSchema } from "./schema";
+import { MUTATE_ADD_ITEM, MUTATE_REMOVE_ITEM } from "./mutations";
 
 
 const link = createHttpLink({
@@ -72,6 +72,13 @@ async function addItemToBasket(productId: number, quantity: number) {
     })
 }
 
+async function removeItemFromBasket(productId: number) {
+    return await client.mutate<RemoveBasketItemSchema>({
+        mutation: MUTATE_REMOVE_ITEM,
+        variables: { productId: parseInt(productId.toString()) }
+    })
+}
+
 const catalog = {
     fetchFilters,
     fetchProducts,
@@ -81,7 +88,8 @@ const catalog = {
 
 const basket = {
     fetch: fetchBasket,
-    add: addItemToBasket
+    add: addItemToBasket,
+    remove: removeItemFromBasket
 }
 
 export const requests = {
