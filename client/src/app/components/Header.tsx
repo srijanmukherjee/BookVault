@@ -108,7 +108,9 @@ export default function Header({ theme, onThemeToggle }: Props) {
 									my: 2,
 									color: "white",
 									display: "block",
-								}}>
+								}}
+								component={Link}
+								to="/account/login">
 								Login
 							</Button>
 							<Button
@@ -116,7 +118,9 @@ export default function Header({ theme, onThemeToggle }: Props) {
 									my: 2,
 									color: "white",
 									display: "block",
-								}}>
+								}}
+								component={Link}
+								to="/account/register">
 								Register
 							</Button>
 						</Box>

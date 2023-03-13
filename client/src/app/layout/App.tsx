@@ -14,6 +14,8 @@ import ProductDetail from "../../features/product/ProductDetail";
 import { fetchBasket } from "../../features/basket/basketSlice";
 import { useAppDispatch } from "../store";
 import Basket from "../../features/basket/Basket";
+import Login from "../../features/account/Login";
+import Register from "../../features/account/Register";
 
 const THEME_KEY = "theme";
 
@@ -57,6 +59,8 @@ function App() {
 					<Route path="/catalog" element={<Catalog />} />
 					<Route path="/product/:slug" element={<ProductDetail />} />
 					<Route path="/cart" element={<Basket />} />
+					<Route path="/account/login" element={<Login />} />
+					<Route path="/account/register" element={<Register />} />
 				</Routes>
 			</Box>
 		</ThemeProvider>
