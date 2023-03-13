@@ -3,12 +3,14 @@ import {
 	Button,
 	CircularProgress,
 	Container,
+	Grid,
 	Typography,
 	useTheme,
 } from "@mui/material";
 import { useAppSelector } from "../../app/store";
 import BasketTable from "./BasketTable";
 import { useNavigate } from "react-router-dom";
+import BasketSummary from "./BasketSummary";
 
 function Basket() {
 	const { status, basket } = useAppSelector((state) => state.basket);
@@ -48,7 +50,14 @@ function Basket() {
 			<Typography variant="h3" mb={2}>
 				Shopping Cart
 			</Typography>
-			<BasketTable />
+			<Grid container columnSpacing={5}>
+				<Grid item xs={12} md={9}>
+					<BasketTable />
+				</Grid>
+				<Grid item xs={12} md={3}>
+					<BasketSummary />
+				</Grid>
+			</Grid>
 		</Container>
 	);
 }
