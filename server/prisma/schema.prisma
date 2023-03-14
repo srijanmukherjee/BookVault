@@ -64,11 +64,21 @@ model Basket {
 }
 
 model User {
-  id          Int      @id @default(autoincrement())
-  email       String   @unique
-  phonenumber String   @unique
-  firstName   String
-  lastName    String
-  verified    Boolean  @default(false)
-  createdAt   DateTime @updatedAt
+  id            Int               @id @default(autoincrement())
+  email         String            @unique
+  phonenumber   String            @unique
+  firstName     String
+  lastName      String
+  password      String
+  emailVerified Boolean           @default(false)
+  createdAt     DateTime          @updatedAt
+  emailToken    VerificationToken @relation(references: [id], fields: [emailTokenId])
+  emailTokenId  Int               @unique
+}
+
+model VerificationToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  createdAt DateTime @updatedAt
+  user      User?
 }

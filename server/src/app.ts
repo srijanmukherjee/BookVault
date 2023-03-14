@@ -3,10 +3,11 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import graphqlRouter from "./routes/graphql"
+import transporter from './controller/mail';
 
 dotenv.config();
 
-const app = express();
+const app: Express = express();
 const port = process.env.PORT || 8000;
 
 app.use(cors({
@@ -21,6 +22,14 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 app.use('/graphql', graphqlRouter);
+
+transporter.verify(function (error, success) {
+  if (error) {
+    console.log('🟥 Mail transporter verification failed')
+  } else {
+    console.log("🟩 Mail transporter ready");
+  }
+});
 
 app.listen(port, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
