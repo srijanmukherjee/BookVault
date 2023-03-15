@@ -1,61 +1,14 @@
-import { IsEmail, IsMobilePhone, IsNotEmpty, IsPhoneNumber, MaxLength, MinLength, ValidationError } from "class-validator";
-import { Arg, Args, ArgsType, ArgumentValidationError, Extensions, Field, ID, InputType, Mutation, ObjectType, Resolver } from "type-graphql";
-import { client } from "../db";
-import { GraphQLError } from "graphql";
-import bcrypt from "bcrypt"
-import { v4 as uuid4 } from 'uuid'
-import { sendVerificationEmail } from "../controller/emails";
-
-@ObjectType("Account")
-export class Account {
-    @Field(type => ID)
-    id: number
-
-    @Field()
-    email: string
-
-    @Field()
-    phonenumber: string
-
-    @Field()
-    firstName: string
-
-    @Field()
-    lastName: string
-
-    @Field(type => Boolean)
-    emailVerified: boolean
-
-    @Field(type => Date)
-    createdAt: Date
-}
-
-@ArgsType()
-class RegistrationParams {
-    @Field()
-    @IsNotEmpty({ message: 'First name cannot be empty' })
-    firstName: string
-
-    @Field()
-    @IsNotEmpty({ message: 'Last name cannot be empty' })
-    lastName: string
-
-    @Field()
-    @IsEmail({}, { message: "Invalid email provided" })
-    email: string
-
-    @Field()
-    @IsPhoneNumber("IN", { message: 'Invalid phone number provided' })
-    phonenumber: string
-
-    @Field(type => String)
-    @MinLength(8, { message: 'Password should be minimum 8 characters long' })
-    @MaxLength(52, { message: 'Password should be maximum 52 characters long' })
-    password: string
-}
+import { ValidationError } from "class-validator";
+import { Resolver, Mutation, Args, ArgumentValidationError } from "type-graphql";
+import { sendVerificationEmail } from "../../controller/emails";
+import { client } from "../../db";
+import Account from "./Account.model";
+import { v4 as uuid4 } from "uuid";
+import bcrypt from "bcrypt";
+import { RegistrationParams } from "./Account.params";
 
 @Resolver(of => Account)
-export class AccountResolver {
+class AccountResolver {
 
     @Mutation(returns => Account, { nullable: true, description: "Register a user" })
     async register(@Args({ validate: true }) { firstName, lastName, email, phonenumber, password }: RegistrationParams) {
@@ -133,3 +86,5 @@ export class AccountResolver {
         return error;
     }
 }
+
+export default AccountResolver;

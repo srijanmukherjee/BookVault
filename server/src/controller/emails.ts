@@ -1,5 +1,5 @@
 import ejs from "ejs";
-import { Account } from "../models/Account.model";
+import { Account } from "../models";
 import transporter from "./mail";
 import { readFileSync } from "fs";
 
