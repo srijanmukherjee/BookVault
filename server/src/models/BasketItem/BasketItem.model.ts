@@ -1,9 +1,9 @@
 import { Field, ID, ObjectType } from "type-graphql"
-import { Basket } from "./Basket.model"
-import { Product } from "./Product.model"
+import Basket from "../Basket/Basket.model"
+import Product from "../Product/Product.model"
 
 @ObjectType("BasketItem")
-export class BasketItem {
+class BasketItem {
     @Field(type => ID)
     id: number
 
@@ -22,3 +22,5 @@ export class BasketItem {
     @Field()
     basketId: string
 }
+
+export default BasketItem;

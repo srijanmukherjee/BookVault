@@ -1,51 +1,141 @@
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Copyright from "./Copyright";
-import { FieldValues, useForm } from "react-hook-form";
+import {
+	FieldErrors,
+	FieldValues,
+	UseFormRegister,
+	useForm,
+} from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Link } from "react-router-dom";
+import { TextFieldProps } from "@material-ui/core";
+import { useRef, useState } from "react";
+import { LoadingButton } from "@mui/lab";
+import { RegistrationParams, requests } from "../../app/api/agent";
+import { ApolloError } from "@apollo/client";
+import { toast } from "react-toastify";
 
 const phoneRegExp =
 	/^((\+\d{1,3}(-| )?\(?\d\)?(-| )?\d{1,3})|(\(?\d{2,3}\)?))(-| )?(\d{3,4})(-| )?(\d{4})(( x| ext)\d{1,5}){0,1}$/;
 
-const PASSWORD_HINT = "Password must be 8 characters long";
+const DEFAULT_PASSWORD_HINT = "Password must be 8 characters long";
 
 const schema = yup.object({
 	firstName: yup.string().required("First name is required"),
 	lastName: yup.string().required("Last name is required"),
 	email: yup.string().required("Email is required").email(),
-	tel: yup
+	phonenumber: yup
 		.string()
 		.required("Your phone number is required for registration")
 		.matches(phoneRegExp, "Phone number is not valid"),
 	password: yup
 		.string()
 		.required("Password is required ")
-		.min(8, PASSWORD_HINT),
+		.min(8, DEFAULT_PASSWORD_HINT),
 });
+
+type RegistrationFieldProps = {
+	label: string;
+	name: string;
+	helperText?: string | JSX.Element;
+	spellCheck?: boolean;
+	autoComplete?: string;
+	type?: string;
+	disabled?: boolean;
+	register: UseFormRegister<FieldValues>;
+	error: any;
+};
+
+function RegistrationField({
+	register,
+	error,
+	...props
+}: RegistrationFieldProps) {
+	if (!props.name)
+		throw new Error("RegistrationField requires a name property");
+
+	const helperText =
+		(error && error.message?.toString()) || props.helperText ? (
+			<Typography
+				component="span"
+				fontSize="small"
+				ml="-15px"
+				pt="10px"
+				display="inline-block">
+				{error?.message?.toString() ?? props.helperText}
+			</Typography>
+		) : null;
+
+	const textFieldProps: any = {
+		spellCheck: false,
+		...props,
+		...register(props.name),
+		helperText,
+	};
+
+	return <TextField {...textFieldProps} fullWidth error={!!error} />;
+}
 
 function Register() {
 	const {
 		register,
 		handleSubmit,
-		formState: { errors },
+		setError,
+		reset,
+		formState: { errors, isValid },
 	} = useForm({
 		resolver: yupResolver(schema),
 		mode: "all",
 	});
 
-	const onSubmit = (data: FieldValues) => {
-		console.log(data);
+	const [registering, setRegistering] = useState(false);
+
+	const handleError = (error: any) => {
+		if (error instanceof ApolloError && error.graphQLErrors.length == 1) {
+			const fieldErrors: any = error.graphQLErrors[0].extensions?.errors;
+
+			if (!fieldErrors) {
+				toast.error("Something went wrong while creating account");
+			} else {
+				let first = true;
+				for (const e of fieldErrors) {
+					setError(
+						e.field,
+						{ message: e.errors[0] },
+						{ shouldFocus: first }
+					);
+					first = false;
+				}
+			}
+		} else {
+			toast.error("Something went wrong while creating account");
+		}
+	};
+
+	const onSubmit = async (formData: FieldValues) => {
+		setRegistering(true);
+		try {
+			const { data } = await requests.account.register(
+				formData as RegistrationParams
+			);
+			toast.success(
+				`Account created. We have sent a verification link to ${formData.email}`,
+				{ autoClose: false }
+			);
+			reset();
+		} catch (error) {
+			handleError(error);
+		} finally {
+			setRegistering(false);
+		}
 	};
 
 	return (
@@ -70,84 +160,86 @@ function Register() {
 					sx={{ mt: 3 }}>
 					<Grid container spacing={2}>
 						<Grid item xs={12} sm={6}>
-							<TextField
+							<RegistrationField
 								autoComplete="given-name"
-								fullWidth
 								label="First Name"
-								{...register("firstName")}
-								error={!!errors.firstName}
-								helperText={errors.firstName?.message?.toString()}
+								name="firstName"
+								register={register}
+								error={errors.firstName}
+								disabled={registering}
 							/>
 						</Grid>
 						<Grid item xs={12} sm={6}>
-							<TextField
-								fullWidth
-								id="lastName"
+							<RegistrationField
 								label="Last Name"
 								autoComplete="family-name"
-								{...register("lastName")}
-								error={!!errors.lastName}
-								helperText={errors.lastName?.message?.toString()}
+								name="lastName"
+								register={register}
+								error={errors.lastName}
+								disabled={registering}
 							/>
 						</Grid>
 						<Grid item xs={12}>
-							<TextField
-								fullWidth
+							<RegistrationField
 								label="Email Address"
 								autoComplete="email"
-								{...register("email")}
-								error={!!errors.email}
-								helperText={errors.email?.message?.toString()}
+								name="email"
+								register={register}
+								error={errors.email}
+								disabled={registering}
 							/>
 						</Grid>
 						<Grid item xs={12}>
-							<TextField
-								fullWidth
+							<RegistrationField
 								label="Phone number"
 								autoComplete="tel"
-								{...register("tel")}
-								error={!!errors.tel}
-								helperText={errors.tel?.message?.toString()}
+								name="phonenumber"
+								register={register}
+								error={errors.phonenumber}
+								disabled={registering}
 							/>
 						</Grid>
 						<Grid item xs={12}>
-							<TextField
-								fullWidth
+							<RegistrationField
 								label="Password"
 								type="password"
-								id="password"
 								autoComplete="new-password"
-								{...register("password")}
-								error={!!errors.password}
-								helperText={
-									errors.password?.message?.toString() ??
-									PASSWORD_HINT
-								}
+								name="password"
+								register={register}
+								error={errors.password}
+								helperText={DEFAULT_PASSWORD_HINT}
+								disabled={registering}
 							/>
 						</Grid>
 						<Grid item xs={12}>
-							<Typography>
+							<Typography
+								color="text.secondary"
+								textAlign="justify"
+								fontSize="small">
+								{/* Taken from Amazon :p */}
 								By enrolling your mobile phone number, you
 								consent to receive automated security
-								notifications via text message from Amazon.
+								notifications via text message from BookVault.
 								Message and data rates may apply.
 							</Typography>
 						</Grid>
 					</Grid>
-					<Button
+					<LoadingButton
+						loading={registering}
+						disabled={!isValid}
 						type="submit"
 						fullWidth
 						variant="contained"
 						sx={{ mt: 3, mb: 2 }}>
 						Sign Up
-					</Button>
+					</LoadingButton>
 					<Grid container justifyContent="flex-end">
 						<Grid item>
 							<Typography
 								component={Link}
 								to="/account/login"
 								sx={{
-									color: "text.primary",
+									color: "text.secondary",
 									textDecoration: "none",
 									"&:hover": {
 										color: "primary.dark",
@@ -159,7 +251,7 @@ function Register() {
 					</Grid>
 				</Box>
 			</Box>
-			<Copyright sx={{ mt: 5 }} />
+			<Copyright sx={{ my: 5 }} />
 		</Container>
 	);
 }

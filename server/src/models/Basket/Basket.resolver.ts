@@ -1,24 +1,11 @@
-import 'reflect-metadata';
-import { ObjectType, Field, Resolver, Query, ID, Arg, Ctx, UseMiddleware, Mutation } from 'type-graphql';
-import { client } from '../db';
-import { BasketItem } from './BasketItem.model';
-import { BasketInterceptor, BasketLastUpdate, Context } from './middleware/BasketMiddleware';
-import { Prisma } from '@prisma/client';
-
-@ObjectType("Basket")
-export class Basket {
-    @Field(type => ID)
-    id: string
-
-    @Field(type => [BasketItem])
-    basketItems: BasketItem[]
-
-    @Field(type => Date)
-    lastUpdate: Date
-}
+import { Prisma } from "@prisma/client";
+import { client } from "../../db";
+import { Arg, Ctx, Mutation, Query, Resolver, UseMiddleware } from "type-graphql";
+import Basket from "./Basket.model";
+import { BasketInterceptor, BasketLastUpdate, Context } from "./middleware/Basket.middleware";
 
 @Resolver(Basket)
-export class BasketResolver {
+class BasketResolver {
     @Query((returns) => Basket, { nullable: true })
     @UseMiddleware(BasketInterceptor)
     async basket(@Ctx() context: Context) {
@@ -153,3 +140,5 @@ export class BasketResolver {
         }
     }
 }
+
+export default BasketResolver;

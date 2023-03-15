@@ -1,12 +1,13 @@
 import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client";
 import { FETCH_BASKET, FETCH_FILTERS, FETCH_PRODUCT, FETCH_PRODUCTS, FETCH_PRODUCT_DESCRIPTION as FETCH_PRODUCT_DESCRIPTION_CATEGORIES } from "./queries";
-import { AddBasketItemSchema, BasketSchema, FiltersSchema, PaginatedProductSchema, ProductSchema, RemoveBasketItemSchema } from "./schema";
-import { MUTATE_ADD_ITEM, MUTATE_REMOVE_ITEM } from "./mutations";
+import { AddBasketItemSchema, BasketSchema, FiltersSchema, PaginatedProductSchema, ProductSchema, RegisterUserSchema, RemoveBasketItemSchema } from "./schema";
+import { MUTATE_ADD_ITEM, MUTATE_REGISTER_USER, MUTATE_REMOVE_ITEM } from "./mutations";
+import { User } from "../models/user";
 
 
 const link = createHttpLink({
     uri: 'http://localhost:8080/graphql',
-    credentials: 'include'
+    credentials: 'include',
 })
 
 export const client = new ApolloClient({
@@ -79,6 +80,29 @@ async function removeItemFromBasket(productId: number) {
     })
 }
 
+export type RegistrationParams = Partial<User> & {
+    password: string;
+}
+
+function registerUser(user: RegistrationParams, signal?: AbortSignal) {
+    return client.mutate<RegisterUserSchema>({
+        mutation: MUTATE_REGISTER_USER,
+        variables: {
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            phonenumber: user.phonenumber,
+            password: user.password
+        },
+        context: {
+            fetchOptions: {
+                signal
+            }
+        }
+
+    })
+}
+
 const catalog = {
     fetchFilters,
     fetchProducts,
@@ -92,6 +116,10 @@ const basket = {
     remove: removeItemFromBasket
 }
 
+const account = {
+    register: registerUser
+}
+
 export const requests = {
-    catalog, basket
+    catalog, basket, account
 }

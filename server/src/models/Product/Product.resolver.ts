@@ -1,84 +1,10 @@
-import 'reflect-metadata';
-import { ObjectType, Field, Resolver, Query, ID, ArgsType, Int, Args, registerEnumType, Arg } from 'type-graphql';
-import { client } from '../db';
-import { Book } from './Book.model';
-import { DEFAULT_ITEMS_PER_PAGE, MAX_ITEMS_PER_PAGE } from './constants';
-import { Max, Min } from 'class-validator';
-import { PaginatedResponse } from './PaginatedResponse'
-
-@ObjectType("Product")
-export class Product {
-    @Field(type => ID)
-    id: number
-
-    @Field(type => Book, { nullable: true })
-    book?: Book
-
-    @Field(type => Int)
-    bookId: number
-
-    @Field()
-    slug: string
-
-    @Field(type => Int)
-    price: number
-
-    @Field()
-    discount: number
-
-    @Field()
-    featured: boolean
-
-    @Field()
-    rating: number
-}
-
-enum ProductSortingType {
-    RELEVANCE,
-    PRICE_LOW_TO_HIGH,
-    PRICE_HIGH_TO_LOW
-}
-
-registerEnumType(ProductSortingType, {
-    name: "ProductSortingOption",
-    description: "Accepted sorting modes"
-})
-
-@ArgsType()
-class ProductParams {
-    @Field(type => Int)
-    @Min(1)
-    page: number = 1
-
-    @Field(type => Int)
-    @Min(10)
-    @Max(MAX_ITEMS_PER_PAGE)
-    itemsPerPage: number = DEFAULT_ITEMS_PER_PAGE
-
-    @Field({ nullable: true })
-    search?: string
-
-    @Field(type => Int, { nullable: true })
-    category?: number
-
-    @Field(type => ProductSortingType, { nullable: true })
-    sortBy?: ProductSortingType = ProductSortingType.RELEVANCE
-
-    @Field(type => Int, { nullable: true })
-    rating?: number
-
-    @Field(type => [Int], { nullable: true })
-    languages?: number[]
-}
-
-@ObjectType()
-class PaginatedProductsResponse extends PaginatedResponse {
-    @Field(type => [Product])
-    data: Product[]
-}
+import { Arg, Args, Query, Resolver } from "type-graphql";
+import { client } from "../../db";
+import { ProductParams, ProductSortingType } from "./Product.params";
+import Product, { PaginatedProductsResponse } from "./Product.model";
 
 @Resolver(Product)
-export class ProductResolver {
+class ProductResolver {
     @Query((returns) => PaginatedProductsResponse, { nullable: true })
     async products(@Args() { page, itemsPerPage, search, category, sortBy, rating, languages }: ProductParams) {
         const { where, orderBy } = this.buildQuery(search, category, sortBy, rating, languages);
@@ -213,3 +139,5 @@ export class ProductResolver {
         return { where: query, orderBy }
     }
 }
+
+export default ProductResolver;

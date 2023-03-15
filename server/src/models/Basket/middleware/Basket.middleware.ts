@@ -3,8 +3,8 @@ import { IncomingMessage } from "http";
 import { MiddlewareInterface, NextFn, ResolverData } from "type-graphql";
 import { Service } from "typedi";
 import { v4 as uuidv4 } from 'uuid';
-import { client } from "../../db";
-import { Basket } from "../Basket.model";
+import { client } from "../../../db";
+import Basket from "../Basket.model";
 
 export interface Context extends IncomingMessage {
     res: Response,

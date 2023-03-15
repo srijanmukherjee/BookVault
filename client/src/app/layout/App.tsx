@@ -16,6 +16,8 @@ import { useAppDispatch } from "../store";
 import Basket from "../../features/basket/Basket";
 import Login from "../../features/account/Login";
 import Register from "../../features/account/Register";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const THEME_KEY = "theme";
 
@@ -63,6 +65,7 @@ function App() {
 					<Route path="/account/register" element={<Register />} />
 				</Routes>
 			</Box>
+			<ToastContainer position="bottom-right" theme="colored" />
 		</ThemeProvider>
 	);
 }
