@@ -7,7 +7,7 @@ import { User } from "../models/user";
 
 const link = createHttpLink({
     uri: 'http://localhost:8080/graphql',
-    credentials: 'include'
+    credentials: 'include',
 })
 
 export const client = new ApolloClient({
@@ -84,7 +84,7 @@ export type RegistrationParams = Partial<User> & {
     password: string;
 }
 
-function registerUser(user: RegistrationParams) {
+function registerUser(user: RegistrationParams, signal?: AbortSignal) {
     return client.mutate<RegisterUserSchema>({
         mutation: MUTATE_REGISTER_USER,
         variables: {
@@ -93,7 +93,13 @@ function registerUser(user: RegistrationParams) {
             email: user.email,
             phonenumber: user.phonenumber,
             password: user.password
+        },
+        context: {
+            fetchOptions: {
+                signal
+            }
         }
+
     })
 }
 

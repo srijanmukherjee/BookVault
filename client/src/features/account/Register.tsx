@@ -17,10 +17,11 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Link } from "react-router-dom";
 import { TextFieldProps } from "@material-ui/core";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { LoadingButton } from "@mui/lab";
 import { RegistrationParams, requests } from "../../app/api/agent";
 import { ApolloError } from "@apollo/client";
+import { toast } from "react-toastify";
 
 const phoneRegExp =
 	/^((\+\d{1,3}(-| )?\(?\d\)?(-| )?\d{1,3})|(\(?\d{2,3}\)?))(-| )?(\d{3,4})(-| )?(\d{4})(( x| ext)\d{1,5}){0,1}$/;
@@ -88,6 +89,7 @@ function Register() {
 		register,
 		handleSubmit,
 		setError,
+		reset,
 		formState: { errors, isValid },
 	} = useForm({
 		resolver: yupResolver(schema),
@@ -96,34 +98,41 @@ function Register() {
 
 	const [registering, setRegistering] = useState(false);
 
+	const handleError = (error: any) => {
+		if (error instanceof ApolloError && error.graphQLErrors.length == 1) {
+			const fieldErrors: any = error.graphQLErrors[0].extensions?.errors;
+
+			if (!fieldErrors) {
+				toast.error("Something went wrong while creating account");
+			} else {
+				let first = true;
+				for (const e of fieldErrors) {
+					setError(
+						e.field,
+						{ message: e.errors[0] },
+						{ shouldFocus: first }
+					);
+					first = false;
+				}
+			}
+		} else {
+			toast.error("Something went wrong while creating account");
+		}
+	};
+
 	const onSubmit = async (formData: FieldValues) => {
 		setRegistering(true);
 		try {
-			const { data, errors, extensions } =
-				await requests.account.register(formData as RegistrationParams);
-			console.log(errors);
+			const { data } = await requests.account.register(
+				formData as RegistrationParams
+			);
+			toast.success(
+				`Account created. We have sent a verification link to ${formData.email}`,
+				{ autoClose: false }
+			);
+			reset();
 		} catch (error) {
-			if (
-				error instanceof ApolloError &&
-				error.graphQLErrors.length == 1
-			) {
-				const fieldErrors: any =
-					error.graphQLErrors[0].extensions?.errors;
-
-				if (!fieldErrors) {
-					// SHow some generic error message
-				} else {
-					let first = true;
-					for (const e of fieldErrors) {
-						setError(
-							e.field,
-							{ message: e.errors[0] },
-							{ shouldFocus: first }
-						);
-						first = false;
-					}
-				}
-			}
+			handleError(error);
 		} finally {
 			setRegistering(false);
 		}
