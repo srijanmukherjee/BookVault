@@ -17,6 +17,10 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Link } from "react-router-dom";
 import { TextFieldProps } from "@material-ui/core";
+import { useState } from "react";
+import { LoadingButton } from "@mui/lab";
+import { RegistrationParams, requests } from "../../app/api/agent";
+import { ApolloError } from "@apollo/client";
 
 const phoneRegExp =
 	/^((\+\d{1,3}(-| )?\(?\d\)?(-| )?\d{1,3})|(\(?\d{2,3}\)?))(-| )?(\d{3,4})(-| )?(\d{4})(( x| ext)\d{1,5}){0,1}$/;
@@ -27,7 +31,7 @@ const schema = yup.object({
 	firstName: yup.string().required("First name is required"),
 	lastName: yup.string().required("Last name is required"),
 	email: yup.string().required("Email is required").email(),
-	tel: yup
+	phonenumber: yup
 		.string()
 		.required("Your phone number is required for registration")
 		.matches(phoneRegExp, "Phone number is not valid"),
@@ -44,6 +48,7 @@ type RegistrationFieldProps = {
 	spellCheck?: boolean;
 	autoComplete?: string;
 	type?: string;
+	disabled?: boolean;
 	register: UseFormRegister<FieldValues>;
 	error: any;
 };
@@ -82,14 +87,46 @@ function Register() {
 	const {
 		register,
 		handleSubmit,
-		formState: { errors },
+		setError,
+		formState: { errors, isValid },
 	} = useForm({
 		resolver: yupResolver(schema),
 		mode: "all",
 	});
 
-	const onSubmit = (data: FieldValues) => {
-		console.log(data);
+	const [registering, setRegistering] = useState(false);
+
+	const onSubmit = async (formData: FieldValues) => {
+		setRegistering(true);
+		try {
+			const { data, errors, extensions } =
+				await requests.account.register(formData as RegistrationParams);
+			console.log(errors);
+		} catch (error) {
+			if (
+				error instanceof ApolloError &&
+				error.graphQLErrors.length == 1
+			) {
+				const fieldErrors: any =
+					error.graphQLErrors[0].extensions?.errors;
+
+				if (!fieldErrors) {
+					// SHow some generic error message
+				} else {
+					let first = true;
+					for (const e of fieldErrors) {
+						setError(
+							e.field,
+							{ message: e.errors[0] },
+							{ shouldFocus: first }
+						);
+						first = false;
+					}
+				}
+			}
+		} finally {
+			setRegistering(false);
+		}
 	};
 
 	return (
@@ -120,6 +157,7 @@ function Register() {
 								name="firstName"
 								register={register}
 								error={errors.firstName}
+								disabled={registering}
 							/>
 						</Grid>
 						<Grid item xs={12} sm={6}>
@@ -129,6 +167,7 @@ function Register() {
 								name="lastName"
 								register={register}
 								error={errors.lastName}
+								disabled={registering}
 							/>
 						</Grid>
 						<Grid item xs={12}>
@@ -138,15 +177,17 @@ function Register() {
 								name="email"
 								register={register}
 								error={errors.email}
+								disabled={registering}
 							/>
 						</Grid>
 						<Grid item xs={12}>
 							<RegistrationField
 								label="Phone number"
 								autoComplete="tel"
-								name="tel"
+								name="phonenumber"
 								register={register}
-								error={errors.tel}
+								error={errors.phonenumber}
+								disabled={registering}
 							/>
 						</Grid>
 						<Grid item xs={12}>
@@ -158,6 +199,7 @@ function Register() {
 								register={register}
 								error={errors.password}
 								helperText={DEFAULT_PASSWORD_HINT}
+								disabled={registering}
 							/>
 						</Grid>
 						<Grid item xs={12}>
@@ -173,20 +215,22 @@ function Register() {
 							</Typography>
 						</Grid>
 					</Grid>
-					<Button
+					<LoadingButton
+						loading={registering}
+						disabled={!isValid}
 						type="submit"
 						fullWidth
 						variant="contained"
 						sx={{ mt: 3, mb: 2 }}>
 						Sign Up
-					</Button>
+					</LoadingButton>
 					<Grid container justifyContent="flex-end">
 						<Grid item>
 							<Typography
 								component={Link}
 								to="/account/login"
 								sx={{
-									color: "text.primary",
+									color: "text.secondary",
 									textDecoration: "none",
 									"&:hover": {
 										color: "primary.dark",
@@ -198,7 +242,7 @@ function Register() {
 					</Grid>
 				</Box>
 			</Box>
-			<Copyright sx={{ mt: 5 }} />
+			<Copyright sx={{ my: 5 }} />
 		</Container>
 	);
 }

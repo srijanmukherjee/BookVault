@@ -2,7 +2,7 @@ import { Router } from "express";
 import { RequestInfo, graphqlHTTP } from "express-graphql";
 import { graphqlSchema as schema } from "../schema";
 import { ValidationError } from "class-validator";
-import { GraphQLError, GraphQLFormattedError } from "graphql";
+import { ExecutionArgs, GraphQLError, GraphQLFormattedError } from "graphql";
 import { ArgumentValidationError } from "type-graphql";
 
 const router = Router();
@@ -16,23 +16,25 @@ router.use('/', graphqlHTTP((req, res) => {
         schema,
         graphiql: process.env.NODE_ENV !== 'production',
         context: { req, res },
-        extensions(info) {
+        customFormatErrorFn(error: GraphQLError) {
             const extensions: any = { errors: [] };
-            if (!info.result.errors) return extensions;
+            if (!error) return error;
 
-            for (const error of info.result.errors) {
-                if (!(error instanceof GraphQLError)) continue;
 
-                if (error.originalError instanceof ArgumentValidationError) {
-                    error.originalError.validationErrors.forEach((e) => {
-                        if (!(e instanceof ValidationError)) return;
-                        extensions.errors.push({ field: e.property, errors: e.constraints ? Object.keys(e.constraints).map((key) => e.constraints![key]) : [] })
-                    })
-                }
+            if (error.originalError instanceof ArgumentValidationError) {
+                error.originalError.validationErrors.forEach((e) => {
+                    if (!(e instanceof ValidationError)) return;
+                    extensions.errors.push({ field: e.property, errors: e.constraints ? Object.keys(e.constraints).map((key) => e.constraints![key]) : [] })
+                })
             }
 
-            return extensions
-        },
+            const formattedError = {
+                ...error,
+                extensions
+            }
+
+            return formattedError
+        }
     }
 }));
 

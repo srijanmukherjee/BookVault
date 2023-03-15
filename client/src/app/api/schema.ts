@@ -1,6 +1,7 @@
 import Basket, { BasketItem } from "../models/basket";
 import { Category, Language } from "../models/filters";
 import { Product } from "../models/product";
+import { User } from "../models/user";
 
 export interface CategoriesSchema {
     categories: Category[]
@@ -41,4 +42,8 @@ export interface AddBasketItemSchema {
 
 export interface RemoveBasketItemSchema {
     removeBasketItem: Basket
+}
+
+export interface RegisterUserSchema {
+    register: Partial<User>
 }

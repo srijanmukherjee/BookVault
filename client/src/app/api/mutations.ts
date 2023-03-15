@@ -49,3 +49,11 @@ export const MUTATE_REMOVE_ITEM = gql`
         }
     }
 `
+
+export const MUTATE_REGISTER_USER = gql`
+    mutation Register($firstName: String!, $lastName: String!, $email: String!, $phonenumber: String!, $password: String!) {
+        register(firstName: $firstName, lastName: $lastName, email: $email, phonenumber: $phonenumber, password: $password) {
+            id
+        }
+    }
+`
