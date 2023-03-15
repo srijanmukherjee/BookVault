@@ -1,24 +1,27 @@
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Copyright from "./Copyright";
-import { FieldValues, useForm } from "react-hook-form";
+import {
+	FieldErrors,
+	FieldValues,
+	UseFormRegister,
+	useForm,
+} from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Link } from "react-router-dom";
+import { TextFieldProps } from "@material-ui/core";
 
 const phoneRegExp =
 	/^((\+\d{1,3}(-| )?\(?\d\)?(-| )?\d{1,3})|(\(?\d{2,3}\)?))(-| )?(\d{3,4})(-| )?(\d{4})(( x| ext)\d{1,5}){0,1}$/;
 
-const PASSWORD_HINT = "Password must be 8 characters long";
+const DEFAULT_PASSWORD_HINT = "Password must be 8 characters long";
 
 const schema = yup.object({
 	firstName: yup.string().required("First name is required"),
@@ -31,8 +34,49 @@ const schema = yup.object({
 	password: yup
 		.string()
 		.required("Password is required ")
-		.min(8, PASSWORD_HINT),
+		.min(8, DEFAULT_PASSWORD_HINT),
 });
+
+type RegistrationFieldProps = {
+	label: string;
+	name: string;
+	helperText?: string | JSX.Element;
+	spellCheck?: boolean;
+	autoComplete?: string;
+	type?: string;
+	register: UseFormRegister<FieldValues>;
+	error: any;
+};
+
+function RegistrationField({
+	register,
+	error,
+	...props
+}: RegistrationFieldProps) {
+	if (!props.name)
+		throw new Error("RegistrationField requires a name property");
+
+	const helperText =
+		(error && error.message?.toString()) || props.helperText ? (
+			<Typography
+				component="span"
+				fontSize="small"
+				ml="-15px"
+				pt="10px"
+				display="inline-block">
+				{error?.message?.toString() ?? props.helperText}
+			</Typography>
+		) : null;
+
+	const textFieldProps: any = {
+		spellCheck: false,
+		...props,
+		...register(props.name),
+		helperText,
+	};
+
+	return <TextField {...textFieldProps} fullWidth error={!!error} />;
+}
 
 function Register() {
 	const {
@@ -70,66 +114,61 @@ function Register() {
 					sx={{ mt: 3 }}>
 					<Grid container spacing={2}>
 						<Grid item xs={12} sm={6}>
-							<TextField
+							<RegistrationField
 								autoComplete="given-name"
-								fullWidth
 								label="First Name"
-								{...register("firstName")}
-								error={!!errors.firstName}
-								helperText={errors.firstName?.message?.toString()}
+								name="firstName"
+								register={register}
+								error={errors.firstName}
 							/>
 						</Grid>
 						<Grid item xs={12} sm={6}>
-							<TextField
-								fullWidth
-								id="lastName"
+							<RegistrationField
 								label="Last Name"
 								autoComplete="family-name"
-								{...register("lastName")}
-								error={!!errors.lastName}
-								helperText={errors.lastName?.message?.toString()}
+								name="lastName"
+								register={register}
+								error={errors.lastName}
 							/>
 						</Grid>
 						<Grid item xs={12}>
-							<TextField
-								fullWidth
+							<RegistrationField
 								label="Email Address"
 								autoComplete="email"
-								{...register("email")}
-								error={!!errors.email}
-								helperText={errors.email?.message?.toString()}
+								name="email"
+								register={register}
+								error={errors.email}
 							/>
 						</Grid>
 						<Grid item xs={12}>
-							<TextField
-								fullWidth
+							<RegistrationField
 								label="Phone number"
 								autoComplete="tel"
-								{...register("tel")}
-								error={!!errors.tel}
-								helperText={errors.tel?.message?.toString()}
+								name="tel"
+								register={register}
+								error={errors.tel}
 							/>
 						</Grid>
 						<Grid item xs={12}>
-							<TextField
-								fullWidth
+							<RegistrationField
 								label="Password"
 								type="password"
-								id="password"
 								autoComplete="new-password"
-								{...register("password")}
-								error={!!errors.password}
-								helperText={
-									errors.password?.message?.toString() ??
-									PASSWORD_HINT
-								}
+								name="password"
+								register={register}
+								error={errors.password}
+								helperText={DEFAULT_PASSWORD_HINT}
 							/>
 						</Grid>
 						<Grid item xs={12}>
-							<Typography>
+							<Typography
+								color="text.secondary"
+								textAlign="justify"
+								fontSize="small">
+								{/* Taken from Amazon :p */}
 								By enrolling your mobile phone number, you
 								consent to receive automated security
-								notifications via text message from Amazon.
+								notifications via text message from BookVault.
 								Message and data rates may apply.
 							</Typography>
 						</Grid>
