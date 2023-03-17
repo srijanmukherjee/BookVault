@@ -1,11 +1,12 @@
 import { ValidationError } from "class-validator";
-import { Resolver, Mutation, Args, ArgumentValidationError } from "type-graphql";
+import { Resolver, Mutation, Args, ArgumentValidationError, Query } from "type-graphql";
 import { sendVerificationEmail } from "../../controller/emails";
 import { client } from "../../db";
 import Account from "./Account.model";
 import { v4 as uuid4 } from "uuid";
 import bcrypt from "bcrypt";
 import { RegistrationParams } from "./Account.params";
+import jwt from "jsonwebtoken";
 
 @Resolver(of => Account)
 class AccountResolver {
@@ -71,6 +72,17 @@ class AccountResolver {
         sendVerificationEmail(account, token);
 
         return account;
+    }
+
+    @Query(returns => Account, { nullable: true, description: "Login" })
+    async login() {
+        const token = jwt.sign({
+            email: "21051770@kiit.ac.in",
+            firstName: "Srijan",
+            lastName: "Mukherjee"
+        }, process.env.JWT_SECRET!, { algorithm: 'HS512' });
+
+        return { token }
     }
 
     @Mutation(returns => Account, { nullable: true })

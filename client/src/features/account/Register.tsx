@@ -15,13 +15,14 @@ import {
 } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { TextFieldProps } from "@material-ui/core";
 import { useRef, useState } from "react";
 import { LoadingButton } from "@mui/lab";
 import { RegistrationParams, requests } from "../../app/api/agent";
 import { ApolloError } from "@apollo/client";
 import { toast } from "react-toastify";
+import AccountTextField from "./AccountTextField";
 
 const phoneRegExp =
 	/^((\+\d{1,3}(-| )?\(?\d\)?(-| )?\d{1,3})|(\(?\d{2,3}\)?))(-| )?(\d{3,4})(-| )?(\d{4})(( x| ext)\d{1,5}){0,1}$/;
@@ -42,48 +43,6 @@ const schema = yup.object({
 		.min(8, DEFAULT_PASSWORD_HINT),
 });
 
-type RegistrationFieldProps = {
-	label: string;
-	name: string;
-	helperText?: string | JSX.Element;
-	spellCheck?: boolean;
-	autoComplete?: string;
-	type?: string;
-	disabled?: boolean;
-	register: UseFormRegister<FieldValues>;
-	error: any;
-};
-
-function RegistrationField({
-	register,
-	error,
-	...props
-}: RegistrationFieldProps) {
-	if (!props.name)
-		throw new Error("RegistrationField requires a name property");
-
-	const helperText =
-		(error && error.message?.toString()) || props.helperText ? (
-			<Typography
-				component="span"
-				fontSize="small"
-				ml="-15px"
-				pt="10px"
-				display="inline-block">
-				{error?.message?.toString() ?? props.helperText}
-			</Typography>
-		) : null;
-
-	const textFieldProps: any = {
-		spellCheck: false,
-		...props,
-		...register(props.name),
-		helperText,
-	};
-
-	return <TextField {...textFieldProps} fullWidth error={!!error} />;
-}
-
 function Register() {
 	const {
 		register,
@@ -95,6 +54,8 @@ function Register() {
 		resolver: yupResolver(schema),
 		mode: "all",
 	});
+
+	const navigate = useNavigate();
 
 	const [registering, setRegistering] = useState(false);
 
@@ -130,7 +91,7 @@ function Register() {
 				`Account created. We have sent a verification link to ${formData.email}`,
 				{ autoClose: false }
 			);
-			reset();
+			navigate("/account/login");
 		} catch (error) {
 			handleError(error);
 		} finally {
@@ -160,7 +121,7 @@ function Register() {
 					sx={{ mt: 3 }}>
 					<Grid container spacing={2}>
 						<Grid item xs={12} sm={6}>
-							<RegistrationField
+							<AccountTextField
 								autoComplete="given-name"
 								label="First Name"
 								name="firstName"
@@ -170,7 +131,7 @@ function Register() {
 							/>
 						</Grid>
 						<Grid item xs={12} sm={6}>
-							<RegistrationField
+							<AccountTextField
 								label="Last Name"
 								autoComplete="family-name"
 								name="lastName"
@@ -180,7 +141,7 @@ function Register() {
 							/>
 						</Grid>
 						<Grid item xs={12}>
-							<RegistrationField
+							<AccountTextField
 								label="Email Address"
 								autoComplete="email"
 								name="email"
@@ -190,7 +151,7 @@ function Register() {
 							/>
 						</Grid>
 						<Grid item xs={12}>
-							<RegistrationField
+							<AccountTextField
 								label="Phone number"
 								autoComplete="tel"
 								name="phonenumber"
@@ -200,7 +161,7 @@ function Register() {
 							/>
 						</Grid>
 						<Grid item xs={12}>
-							<RegistrationField
+							<AccountTextField
 								label="Password"
 								type="password"
 								autoComplete="new-password"

@@ -60,6 +60,8 @@ model BasketItem {
 model Basket {
   id          String       @id
   basketItems BasketItem[]
+  user        User?        @relation(references: [email], fields: [userEmail])
+  userEmail   String?      @unique
   lastUpdate  DateTime     @updatedAt
 }
 
@@ -74,6 +76,8 @@ model User {
   createdAt     DateTime          @updatedAt
   emailToken    VerificationToken @relation(references: [id], fields: [emailTokenId])
   emailTokenId  Int               @unique
+  basket        Basket?
+  basketId      String?
 }
 
 model VerificationToken {

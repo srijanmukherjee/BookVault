@@ -15,6 +15,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { Link } from "react-router-dom";
 import { useTheme } from "@mui/material";
+import AccountTextField from "./AccountTextField";
+import { LoadingButton } from "@mui/lab";
 
 const schema = yup.object({
 	email: yup.string().email().required(),
@@ -29,7 +31,7 @@ function Login(): JSX.Element {
 	const {
 		register,
 		handleSubmit,
-		formState: { errors },
+		formState: { errors, isValid },
 	} = useForm({ resolver: yupResolver(schema), mode: "all" });
 
 	const onSubmit: SubmitHandler<FieldValues> = (data) => {
@@ -56,38 +58,41 @@ function Login(): JSX.Element {
 					onSubmit={handleSubmit(onSubmit)}
 					noValidate
 					sx={{ mt: 1 }}>
-					<TextField
+					<AccountTextField
 						margin="normal"
-						fullWidth
-						id="email"
 						label="Email Address"
 						autoComplete="email"
-						{...register("email")}
-						error={!!errors.email}
-						helperText={errors.email?.message?.toString()}
+						name="email"
+						register={register}
+						error={errors.email}
 					/>
-					<TextField
+					<AccountTextField
 						margin="normal"
-						fullWidth
 						label="Password"
 						type="password"
-						id="password"
 						autoComplete="current-password"
-						{...register("password")}
-						error={!!errors.password}
-						helperText={errors.password?.message?.toString()}
+						register={register}
+						name="password"
+						error={errors.password}
 					/>
 					<FormControlLabel
-						control={<Checkbox value="remember" color="primary" />}
+						control={
+							<Checkbox
+								value="remember"
+								color="primary"
+								{...register("remember")}
+							/>
+						}
 						label="Remember me"
 					/>
-					<Button
+					<LoadingButton
 						type="submit"
+						disabled={!isValid}
 						fullWidth
 						variant="contained"
 						sx={{ mt: 3, mb: 2 }}>
 						Sign In
-					</Button>
+					</LoadingButton>
 					<Grid container>
 						<Grid item xs>
 							<Typography
