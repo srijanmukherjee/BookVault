@@ -34,4 +34,25 @@ class Account {
     basketId?: string | null;
 }
 
+@ObjectType()
+export class LoggedInAccount {
+    @Field()
+    email: string;
+
+    @Field()
+    firstName: string;
+
+    @Field()
+    lastName: string;
+
+    @Field()
+    phonenumber: string;
+
+    @Field(type => Boolean)
+    emailVerified: boolean
+
+    @Field()
+    token?: string;
+}
+
 export default Account;
