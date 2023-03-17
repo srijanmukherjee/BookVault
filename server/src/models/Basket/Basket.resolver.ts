@@ -2,30 +2,15 @@ import { Prisma } from "@prisma/client";
 import { client } from "../../db";
 import { Arg, Ctx, Mutation, Query, Resolver, UseMiddleware } from "type-graphql";
 import Basket from "./Basket.model";
-import { BasketInterceptor, BasketLastUpdate, Context } from "./middleware/Basket.middleware";
+import { BasketInterceptor, BasketLastUpdate } from "./middleware/Basket.middleware";
+import { Context } from "../../graphql/context";
 
 @Resolver(Basket)
 class BasketResolver {
     @Query((returns) => Basket, { nullable: true })
     @UseMiddleware(BasketInterceptor)
     async basket(@Ctx() context: Context) {
-        const basketId = context.basket!.id;
-        return client.basket.findFirst({
-            where: {
-                id: basketId
-            },
-            include: {
-                basketItems: {
-                    include: {
-                        product: {
-                            include: {
-                                book: true
-                            }
-                        }
-                    }
-                }
-            }
-        })
+        return context.basket;
     }
 
     @Mutation(type => Basket, { nullable: true })
@@ -119,6 +104,10 @@ class BasketResolver {
     @UseMiddleware(BasketLastUpdate)
     async removeBasketItem(@Arg("productId") productId: number, @Ctx() context: Context) {
         const basketId = context.basket!.id;
+        const basketItem = context.basket?.basketItems.find((item) => item.product.id === productId);
+
+        if (!basketItem) throw new Error("Basket item not found")
+
         try {
             await client.basketItem.delete({
                 where: {

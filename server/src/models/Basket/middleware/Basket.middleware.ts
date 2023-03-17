@@ -1,82 +1,124 @@
-import { Request, Response } from "express";
-import { IncomingMessage } from "http";
 import { MiddlewareInterface, NextFn, ResolverData } from "type-graphql";
 import { Service } from "typedi";
 import { v4 as uuidv4 } from 'uuid';
 import { client } from "../../../db";
+import { Context } from "../../../graphql/context";
+import { getAuthorizedUser } from "../../../auth/AuthChecker";
 import Basket from "../Basket.model";
-
-export interface Context extends IncomingMessage {
-    res: Response,
-    req: Request,
-    basket: Basket | null
-}
+import Account from "../../Account/Account.model";
 
 export const BASKET_COOKIE = 'basketId'
 
-async function createBasket(): Promise<[string, Basket]> {
-    const basketId = uuidv4();
-    console.log(`new basket id: ${basketId}`);
-
-    const basket: Basket = await client.basket.create({
-        data: {
-            id: basketId
-        },
+const basketInclude = {
+    basketItems: {
         include: {
-            basketItems: {
+            product: {
                 include: {
-                    product: {
-                        include: {
-                            book: true
-                        }
-                    },
-                },
-            }
+                    book: true
+                }
+            },
+        },
+    },
+    user: true
+}
+
+async function createBasket(basketId: string, owner: Account | null): Promise<Basket> {
+
+    const update: any = {};
+
+    if (owner) {
+        update.user = {
+            connect: {
+                email: owner.email
+            },
         }
+    }
+
+    const basket: Basket = await client.basket.upsert({
+        where: {
+            id: basketId,
+        },
+        update,
+        create: {
+            id: basketId,
+            ...(owner && { user: { connect: { email: owner.email } } })
+        },
+        include: basketInclude
     });
 
-    return [basketId, basket];
+    // TODO: better way to do this without extra  db call
+    // update owner basket id
+    if (owner) {
+        await client.user.update({
+            where: {
+                id: owner.id,
+            },
+            data: {
+                basketId: basket.id
+            }
+        })
+    }
+
+    return basket;
 }
 
 async function fetchBasket(basketId: string): Promise<Basket | null> {
-    return await client.basket.findFirst({
+    return await client.basket.findUnique({
         where: {
             id: basketId
         },
-        include: {
-            basketItems: {
-                include: {
-                    product: {
-                        include: {
-                            book: true
-                        }
-                    }
-                }
-            }
-        }
+        include: basketInclude
     })
 }
 
-async function createBasketAndSetCookie(context: any) {
-    const [basketId, basket] = await createBasket();
+function setBasketCookie(context: Context, basketId: string) {
     const maxAge = new Date().getTime() + 60 * 60 * 24 * 30 * 1000;
-    context.basket = basket;
     context.res.cookie(BASKET_COOKIE, basketId, { maxAge });
+}
+
+async function createBasketAndSetCookie(context: any) {
+    let basketId;
+    let user = null;
+
+    if (context.user) {
+        user = await getAuthorizedUser(context.user);
+
+        if (user?.basketId) {
+            console.debug("User basket: " + user.basketId)
+            setBasketCookie(context, user.basketId);
+            context.basket = await fetchBasket(user.basketId);
+        }
+
+        if (!context.basket)
+            console.debug("User doesn't have a basket attached to account");
+    }
+
+    // user was quthenticated and alreadty had a linked basket
+    if (context.basket) return;
+
+    // unauthenticated user or authenticated user with no basket
+    basketId = uuidv4();
+    const basket = await createBasket(basketId, user);
+    context.basket = basket;
+    setBasketCookie(context, basketId);
 }
 
 @Service()
 export class BasketInterceptor implements MiddlewareInterface<Context> {
     constructor() { }
 
-    async use({ context, info, args, root }: ResolverData<Context>, next: NextFn) {
+    async use({ context }: ResolverData<Context>, next: NextFn) {
         // create basket if it already doesn't exist
         if (!context.req.cookies[BASKET_COOKIE]) {
             await createBasketAndSetCookie(context);
         } else {
+            console.debug("request basket id: " + context.req.cookies[BASKET_COOKIE]);
+
             const basketId = context.req.cookies[BASKET_COOKIE];
             context.basket = await fetchBasket(basketId);
 
-            if (context.basket === null) {
+            // basket not found or basket user doesn't match
+            if (context.basket === null || (context.user && context.basket.userEmail !== context.user.email)) {
                 await createBasketAndSetCookie(context);
             }
         }
@@ -85,6 +127,7 @@ export class BasketInterceptor implements MiddlewareInterface<Context> {
     }
 }
 
+// updates basket's lastUpdate time whenever any changes have been made to the basket
 @Service()
 export class BasketLastUpdate implements MiddlewareInterface<Context> {
     constructor() { }

@@ -1,17 +1,26 @@
 import "reflect-metadata";
-import { AuthChecker } from "type-graphql";
+import { AuthChecker, ResolverData } from "type-graphql";
+import { Context, UserPayload } from "../graphql/context";
+import { client } from "../db";
+import { Account } from "../models";
 
-// export class AppAuthChecker implements AuthChecker<ContextType> {
-//     // inject dependency
-//     constructor(private readonly userRepository: Repository<User>) {}
-  
-//     check({ root, args, context, info }: ResolverData<ContextType>, roles: string[]) {
-//       const userId = getUserIdFromToken(context.token);
-//       // use injected service
-//       const user = this.userRepository.getById(userId);
-  
-//       // custom logic here, e.g.:
-//       return user % 2 === 0;
-//     }
-//   }
-  
+export async function getAuthorizedUser(payload: UserPayload, roles: string[] = []): Promise<Account | null> {
+    const { email } = payload;
+
+    const user = await client.user.findUnique({
+        where: {
+            email
+        }
+    });
+
+    return user;
+}
+
+export async function isAuthorized(payload: UserPayload, roles: string[] = []) {
+    return getAuthorizedUser(payload, roles) !== null;
+}
+
+export const authChecker: AuthChecker<Context> = async ({ root, args, context, info }, roles) => {
+    if (!context.user) return false;
+    return await isAuthorized(context.user as UserPayload, roles);
+}

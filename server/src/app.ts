@@ -4,6 +4,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import graphqlRouter from "./routes/graphql"
 import transporter from './controller/mail';
+import { expressjwt } from "express-jwt";
 
 dotenv.config();
 
@@ -21,7 +22,14 @@ app.get('/', (req: Request, res: Response) => {
   res.send('Oops! you are not supposed to access this.');
 });
 
-app.use('/graphql', graphqlRouter);
+app.use(
+  '/graphql',
+  expressjwt({
+    secret: process.env.JWT_SECRET!,
+    algorithms: ["HS512"],
+    credentialsRequired: false
+  }),
+  graphqlRouter);
 
 transporter.verify(function (error, success) {
   if (error) {

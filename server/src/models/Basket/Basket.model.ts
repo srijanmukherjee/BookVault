@@ -1,5 +1,6 @@
 import { ObjectType, Field, ID } from "type-graphql";
 import BasketItem from "../BasketItem/BasketItem.model";
+import Account from "../Account/Account.model";
 
 @ObjectType("Basket")
 class Basket {
@@ -11,6 +12,12 @@ class Basket {
 
     @Field(type => Date)
     lastUpdate: Date
+
+    @Field(type => Account, { nullable: true })
+    user: Account | null
+
+    @Field(type => String, { nullable: true })
+    userEmail: string | null
 }
 
 export default Basket;
