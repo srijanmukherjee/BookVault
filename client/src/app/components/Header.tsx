@@ -16,6 +16,7 @@ import { Link, useNavigate } from "react-router-dom";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { useAppSelector } from "../store";
 import { LoadingButton } from "@mui/lab";
+import LoggedInHeaderPart from "./LoggedInHeaderPart";
 
 const links = [{ label: "Browse", to: "/catalog" }];
 
@@ -102,28 +103,7 @@ export default function Header({ theme, onThemeToggle }: Props) {
 								</Button>
 							))}
 						</Box>
-						<Box display={{ xs: "none", md: "flex" }}>
-							<Button
-								sx={{
-									my: 2,
-									color: "white",
-									display: "block",
-								}}
-								component={Link}
-								to="/account/login">
-								Login
-							</Button>
-							<Button
-								sx={{
-									my: 2,
-									color: "white",
-									display: "block",
-								}}
-								component={Link}
-								to="/account/register">
-								Register
-							</Button>
-						</Box>
+						<LoggedInHeaderPart />
 						<ThemeToggleButton
 							theme={theme}
 							onToggle={onThemeToggle}

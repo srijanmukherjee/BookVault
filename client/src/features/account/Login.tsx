@@ -17,6 +17,10 @@ import { Link } from "react-router-dom";
 import { useTheme } from "@mui/material";
 import AccountTextField from "./AccountTextField";
 import { LoadingButton } from "@mui/lab";
+import { useAppDispatch } from "../../app/store";
+import { login } from "./accountSlice";
+import { toast } from "react-toastify";
+import { useEffect, useLayoutEffect } from "react";
 
 const schema = yup.object({
 	email: yup.string().email().required(),
@@ -27,16 +31,47 @@ const schema = yup.object({
 });
 
 function Login(): JSX.Element {
-	const theme = useTheme();
+	const dispatch = useAppDispatch();
+
 	const {
 		register,
 		handleSubmit,
+		setError,
 		formState: { errors, isValid },
 	} = useForm({ resolver: yupResolver(schema), mode: "all" });
 
-	const onSubmit: SubmitHandler<FieldValues> = (data) => {
-		console.log(data);
+	const handleError = (error: any) => {
+		if (error instanceof String) {
+			toast.error(error);
+		} else if (Array.isArray(error)) {
+			let first = true;
+			for (const e of error) {
+				setError(
+					e.field,
+					{ message: e.errors[0] },
+					{ shouldFocus: first }
+				);
+				first = false;
+			}
+		} else {
+			toast.error("Something unexpected happend!");
+		}
 	};
+
+	const onSubmit: SubmitHandler<FieldValues> = async (data) => {
+		const { payload } = await dispatch(
+			login({ email: data.email, password: data.password })
+		);
+
+		if (payload && payload instanceof Object && "error" in payload) {
+			handleError(payload.error);
+		} else {
+		}
+	};
+
+	useLayoutEffect(() => {
+		// Do something redirect when already logged in
+	}, []);
 
 	return (
 		<Container component="main" maxWidth="xs">

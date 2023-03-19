@@ -1,17 +1,30 @@
-import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client";
-import { FETCH_BASKET, FETCH_FILTERS, FETCH_PRODUCT, FETCH_PRODUCTS, FETCH_PRODUCT_DESCRIPTION as FETCH_PRODUCT_DESCRIPTION_CATEGORIES } from "./queries";
-import { AddBasketItemSchema, BasketSchema, FiltersSchema, PaginatedProductSchema, ProductSchema, RegisterUserSchema, RemoveBasketItemSchema } from "./schema";
+import { ApolloClient, ApolloLink, InMemoryCache, createHttpLink } from "@apollo/client";
+import { FETCH_BASKET, FETCH_FILTERS, FETCH_PRODUCT, FETCH_PRODUCTS, FETCH_PRODUCT_DESCRIPTION as FETCH_PRODUCT_DESCRIPTION_CATEGORIES, LOGIN_USER } from "./queries";
+import { AddBasketItemSchema, BasketSchema, FiltersSchema, LoggedInUserSchema, PaginatedProductSchema, ProductSchema, RegisterUserSchema, RemoveBasketItemSchema } from "./schema";
 import { MUTATE_ADD_ITEM, MUTATE_REGISTER_USER, MUTATE_REMOVE_ITEM } from "./mutations";
 import { User } from "../models/user";
 
+export const LOCAL_STORAGE_AUTH_KEY = 'token'
 
 const link = createHttpLink({
     uri: 'http://localhost:8080/graphql',
     credentials: 'include',
 })
 
+const authLink = new ApolloLink((operation, forward) => {
+    const token = localStorage.getItem(LOCAL_STORAGE_AUTH_KEY);
+
+    operation.setContext({
+        headers: {
+            authorization: token ? `Bearer ${token}` : ''
+        }
+    })
+
+    return forward(operation);
+})
+
 export const client = new ApolloClient({
-    link,
+    link: authLink.concat(link),
     cache: new InMemoryCache(),
 });
 
@@ -103,6 +116,13 @@ function registerUser(user: RegistrationParams, signal?: AbortSignal) {
     })
 }
 
+function loginUser(email?: string, password?: string) {
+    return client.query<LoggedInUserSchema>({
+        query: LOGIN_USER,
+        variables: { email, password }
+    })
+}
+
 const catalog = {
     fetchFilters,
     fetchProducts,
@@ -117,7 +137,8 @@ const basket = {
 }
 
 const account = {
-    register: registerUser
+    register: registerUser,
+    login: loginUser
 }
 
 export const requests = {
