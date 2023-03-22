@@ -1,28 +1,16 @@
-import {
-	Box,
-	Button,
-	CircularProgress,
-	Container,
-	Grid,
-	Typography,
-	useTheme,
-} from "@mui/material";
+import { Button, Container, Grid, Typography } from "@mui/material";
 import { useAppSelector } from "../../app/store";
 import BasketTable from "./BasketTable";
 import { useNavigate } from "react-router-dom";
 import BasketSummary from "./BasketSummary";
+import Loader from "../../app/components/Loader";
 
 function Basket() {
 	const { status, basket } = useAppSelector((state) => state.basket);
 	const navigate = useNavigate();
-	const theme = useTheme();
 
 	if (status === "loading" && (!basket || basket?.basketItems.length == 0)) {
-		return (
-			<Box display="grid" sx={{ placeItems: "center" }} height="100vh">
-				<CircularProgress size={24} />
-			</Box>
-		);
+		return <Loader />;
 	}
 
 	// Show some empty cart message

@@ -1,8 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import Basket, { BasketItem } from "../../app/models/basket";
+import Basket from "../../app/models/basket";
 import { requests } from "../../app/api/agent";
 import { RootState } from "../../app/store";
-import { deleteCookie } from "../../app/util";
 
 interface BasketState {
     status: 'loading' | 'idle',

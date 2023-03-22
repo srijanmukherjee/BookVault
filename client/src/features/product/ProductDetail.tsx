@@ -1,29 +1,17 @@
 import { useParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/store";
-import {
-	fetchProduct,
-	fetchProductDescriptionCategories,
-	productSelectors,
-} from "../catalog/catalogSlice";
+import { fetchProduct, fetchProductDescriptionCategories, productSelectors } from "../catalog/catalogSlice";
 import { useEffect } from "react";
-import {
-	Box,
-	Chip,
-	CircularProgress,
-	Container,
-	Grid,
-	Typography,
-} from "@mui/material";
+import { Box, Chip, Container, Grid, Typography } from "@mui/material";
 import Image from "mui-image";
 import { ProductPrice } from "../catalog/CatalogListItem";
 import ProductCartButton from "../../app/components/ProductCartButton";
+import Loader from "../../app/components/Loader";
 
 export default function ProductDetail() {
 	const { slug } = useParams<{ slug: string }>();
 	const dispatch = useAppDispatch();
-	const product = useAppSelector((state) =>
-		productSelectors.selectById(state, slug!)
-	);
+	const product = useAppSelector((state) => productSelectors.selectById(state, slug!));
 	const { status } = useAppSelector((state) => state.catalog);
 
 	useEffect(() => {
@@ -31,25 +19,12 @@ export default function ProductDetail() {
 
 		if (product === undefined || !product.book) {
 			dispatch(fetchProduct(slug!));
-		} else if (
-			product &&
-			product.book &&
-			(!product?.book?.description || !product?.book.categories)
-		) {
+		} else if (product && product.book && (!product?.book?.description || !product?.book.categories)) {
 			dispatch(fetchProductDescriptionCategories(slug!));
 		}
 	}, [product, dispatch, slug]);
 
-	if (
-		status === "products-loading" ||
-		status === "product-information-loading"
-	) {
-		return (
-			<Box display="grid" sx={{ placeItems: "center" }} height="100vh">
-				<CircularProgress size={24} />
-			</Box>
-		);
-	}
+	if (status === "products-loading" || status === "product-information-loading") return <Loader />;
 
 	if (!product) {
 		return <h1>Not found</h1>;
@@ -58,13 +33,7 @@ export default function ProductDetail() {
 	return (
 		<Container maxWidth="xl">
 			<Grid container spacing={4} py={4}>
-				<Grid
-					item
-					xs={12}
-					md={4}
-					display="flex"
-					alignItems="center"
-					justifyContent="center">
+				<Grid item xs={12} md={4} display="flex" alignItems="center" justifyContent="center">
 					<Image
 						src={product.book?.image!}
 						alt={product.book?.name!}
@@ -87,28 +56,16 @@ export default function ProductDetail() {
 					<Box display="flex" gap="10px" mb={2}>
 						<Typography>Genres </Typography>
 						<Box display="flex" gap="6px" flexWrap="wrap">
-							{product.book?.categories?.map(
-								({ name }, index) => (
-									<Chip
-										color="primary"
-										size="small"
-										label={name}
-										key={index}
-									/>
-								)
-							)}
+							{product.book?.categories?.map(({ name }, index) => (
+								<Chip color="primary" size="small" label={name} key={index} />
+							))}
 						</Box>
 					</Box>
 					<Box display="flex" gap="10px" mb={2}>
 						<Typography>Format </Typography>
 						<Box display="flex" gap="6px">
 							{[product.book?.format].map((format, index) => (
-								<Chip
-									color="warning"
-									size="small"
-									label={format}
-									key={index}
-								/>
+								<Chip color="warning" size="small" label={format} key={index} />
 							))}
 						</Box>
 					</Box>
@@ -130,12 +87,7 @@ export default function ProductDetail() {
 						</Typography>
 						<Box display="flex" gap="6px">
 							{product.book?.languages?.map(({ name }, index) => (
-								<Chip
-									color="secondary"
-									size="small"
-									label={name}
-									key={index}
-								/>
+								<Chip color="secondary" size="small" label={name} key={index} />
 							))}
 						</Box>
 					</Box>

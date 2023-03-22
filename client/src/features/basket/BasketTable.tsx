@@ -1,12 +1,4 @@
-import {
-	TableContainer,
-	Paper,
-	Table,
-	TableHead,
-	TableRow,
-	TableCell,
-	TableBody,
-} from "@mui/material";
+import { TableContainer, Table, TableHead, TableRow, TableCell, TableBody } from "@mui/material";
 import { useAppSelector } from "../../app/store";
 import BasketItem from "./BasketItem";
 

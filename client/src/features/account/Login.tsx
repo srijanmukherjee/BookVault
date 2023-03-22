@@ -1,7 +1,4 @@
 import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
-import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
 import Grid from "@mui/material/Grid";
@@ -14,23 +11,19 @@ import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { Link, useNavigate } from "react-router-dom";
-import { CircularProgress, useTheme } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 import AccountTextField from "./AccountTextField";
 import { LoadingButton } from "@mui/lab";
 import { useAppDispatch, useAppSelector } from "../../app/store";
 import { login } from "./accountSlice";
 import { toast } from "react-toastify";
-import { useEffect, useLayoutEffect } from "react";
-import { browserHistory } from "../../main";
+import { useEffect } from "react";
 import { LOCAL_STORAGE_AUTH_KEY } from "../../app/api/agent";
 import { fetchBasket } from "../basket/basketSlice";
 
 const schema = yup.object({
 	email: yup.string().email().required(),
-	password: yup
-		.string()
-		.required()
-		.min(8, "Password should be at least 8 characters long"),
+	password: yup.string().required().min(8, "Password should be at least 8 characters long"),
 });
 
 function Login(): JSX.Element {
@@ -51,11 +44,7 @@ function Login(): JSX.Element {
 		} else if (Array.isArray(error)) {
 			let first = true;
 			for (const e of error) {
-				setError(
-					e.field,
-					{ message: e.errors[0] },
-					{ shouldFocus: first }
-				);
+				setError(e.field, { message: e.errors[0] }, { shouldFocus: first });
 				first = false;
 			}
 		} else {
@@ -64,9 +53,7 @@ function Login(): JSX.Element {
 	};
 
 	const onSubmit: SubmitHandler<FieldValues> = async (data) => {
-		const { payload } = await dispatch(
-			login({ email: data.email, password: data.password })
-		);
+		const { payload } = await dispatch(login({ email: data.email, password: data.password }));
 
 		if (payload && payload instanceof Object && "error" in payload) {
 			handleError(payload.error);
@@ -104,11 +91,7 @@ function Login(): JSX.Element {
 				<Typography component="h1" variant="h5">
 					Sign in
 				</Typography>
-				<Box
-					component="form"
-					onSubmit={handleSubmit(onSubmit)}
-					noValidate
-					sx={{ mt: 1 }}>
+				<Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate sx={{ mt: 1 }}>
 					<AccountTextField
 						margin="normal"
 						label="Email Address"
@@ -127,13 +110,7 @@ function Login(): JSX.Element {
 						error={errors.password}
 					/>
 					<FormControlLabel
-						control={
-							<Checkbox
-								value="remember"
-								color="primary"
-								{...register("remember")}
-							/>
-						}
+						control={<Checkbox value="remember" color="primary" {...register("remember")} />}
 						label="Remember me"
 					/>
 					<LoadingButton

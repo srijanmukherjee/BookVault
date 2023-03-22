@@ -1,23 +1,15 @@
 import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Copyright from "./Copyright";
-import {
-	FieldErrors,
-	FieldValues,
-	UseFormRegister,
-	useForm,
-} from "react-hook-form";
+import { FieldValues, useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Link, useNavigate } from "react-router-dom";
-import { TextFieldProps } from "@material-ui/core";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { LoadingButton } from "@mui/lab";
 import { RegistrationParams, requests } from "../../app/api/agent";
 import { ApolloError } from "@apollo/client";
@@ -37,10 +29,7 @@ const schema = yup.object({
 		.string()
 		.required("Your phone number is required for registration")
 		.matches(phoneRegExp, "Phone number is not valid"),
-	password: yup
-		.string()
-		.required("Password is required ")
-		.min(8, DEFAULT_PASSWORD_HINT),
+	password: yup.string().required("Password is required ").min(8, DEFAULT_PASSWORD_HINT),
 });
 
 function Register() {
@@ -68,11 +57,7 @@ function Register() {
 			} else {
 				let first = true;
 				for (const e of fieldErrors) {
-					setError(
-						e.field,
-						{ message: e.errors[0] },
-						{ shouldFocus: first }
-					);
+					setError(e.field, { message: e.errors[0] }, { shouldFocus: first });
 					first = false;
 				}
 			}
@@ -84,13 +69,10 @@ function Register() {
 	const onSubmit = async (formData: FieldValues) => {
 		setRegistering(true);
 		try {
-			const { data } = await requests.account.register(
-				formData as RegistrationParams
-			);
-			toast.success(
-				`Account created. We have sent a verification link to ${formData.email}`,
-				{ autoClose: false }
-			);
+			const { data } = await requests.account.register(formData as RegistrationParams);
+			toast.success(`Account created. We have sent a verification link to ${formData.email}`, {
+				autoClose: false,
+			});
 			navigate("/account/login");
 		} catch (error) {
 			handleError(error);
@@ -114,11 +96,7 @@ function Register() {
 				<Typography component="h1" variant="h5">
 					Sign up
 				</Typography>
-				<Box
-					component="form"
-					noValidate
-					onSubmit={handleSubmit(onSubmit)}
-					sx={{ mt: 3 }}>
+				<Box component="form" noValidate onSubmit={handleSubmit(onSubmit)} sx={{ mt: 3 }}>
 					<Grid container spacing={2}>
 						<Grid item xs={12} sm={6}>
 							<AccountTextField
@@ -173,15 +151,10 @@ function Register() {
 							/>
 						</Grid>
 						<Grid item xs={12}>
-							<Typography
-								color="text.secondary"
-								textAlign="justify"
-								fontSize="small">
+							<Typography color="text.secondary" textAlign="justify" fontSize="small">
 								{/* Taken from Amazon :p */}
-								By enrolling your mobile phone number, you
-								consent to receive automated security
-								notifications via text message from BookVault.
-								Message and data rates may apply.
+								By enrolling your mobile phone number, you consent to receive automated security
+								notifications via text message from BookVault. Message and data rates may apply.
 							</Typography>
 						</Grid>
 					</Grid>

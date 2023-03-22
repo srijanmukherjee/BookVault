@@ -1,12 +1,4 @@
-import { Info } from "@mui/icons-material";
-import {
-	ListItem,
-	ListItemAvatar,
-	ListItemText,
-	Box,
-	Typography,
-	Skeleton,
-} from "@mui/material";
+import { ListItem, ListItemAvatar, ListItemText, Box, Typography, Skeleton } from "@mui/material";
 
 interface Props {
 	product: any;
