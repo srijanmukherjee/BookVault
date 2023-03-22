@@ -3,6 +3,6 @@ export interface User {
     lastName: string;
     email: string;
     phonenumber: string;
-    emailVerified: string;
+    emailVerified: boolean;
     createdAt: Date;
 }

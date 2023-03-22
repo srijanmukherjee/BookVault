@@ -47,3 +47,14 @@ export interface RemoveBasketItemSchema {
 export interface RegisterUserSchema {
     register: Partial<User>
 }
+
+export interface LoggedInUserSchema {
+    login: {
+        email: string;
+        firstName: string;
+        lastName: string;
+        phonenumber?: string;
+        emailVerified: boolean
+        token: string;
+    }
+}

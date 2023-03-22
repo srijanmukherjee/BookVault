@@ -80,6 +80,8 @@ async function createBasketAndSetCookie(context: any) {
     let basketId;
     let user = null;
 
+    context.basket = null;
+
     if (context.user) {
         user = await getAuthorizedUser(context.user);
 
@@ -118,7 +120,9 @@ export class BasketInterceptor implements MiddlewareInterface<Context> {
             context.basket = await fetchBasket(basketId);
 
             // basket not found or basket user doesn't match
-            if (context.basket === null || (context.user && context.basket.userEmail !== context.user.email)) {
+            if (context.basket === null ||
+                (context.user && context.basket.userEmail !== context.user.email) ||
+                (context.basket.userEmail !== null && context.user == null)) {
                 await createBasketAndSetCookie(context);
             }
         }
