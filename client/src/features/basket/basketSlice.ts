@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import Basket, { BasketItem } from "../../app/models/basket";
 import { requests } from "../../app/api/agent";
 import { RootState } from "../../app/store";
+import { deleteCookie } from "../../app/util";
 
 interface BasketState {
     status: 'loading' | 'idle',
@@ -60,7 +61,11 @@ export const removeBasketItem = createAsyncThunk<Basket, number, { state: RootSt
 export const basketSlice = createSlice({
     name: 'basket',
     initialState,
-    reducers: {},
+    reducers: {
+        clearBasket: (state) => {
+            state.basket = null;
+        }
+    },
     extraReducers: (builder) => {
         builder.addCase(fetchBasket.pending, (state, action) => {
             state.status = 'loading'
@@ -114,3 +119,5 @@ export const basketSlice = createSlice({
         })
     }
 })
+
+export const { clearBasket } = basketSlice.actions;

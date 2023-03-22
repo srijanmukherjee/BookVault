@@ -8,7 +8,7 @@ import bcrypt from "bcrypt";
 import { RegistrationParams } from "./Account.params";
 import jwt from "jsonwebtoken";
 import { Context } from "../../graphql/context";
-import { getAuthorizedUser, isAuthorized } from "../../auth/AuthChecker";
+import { getAuthorizedUser } from "../../auth/AuthChecker";
 
 @Resolver(of => Account)
 class AccountResolver {

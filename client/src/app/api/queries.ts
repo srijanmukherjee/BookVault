@@ -122,3 +122,15 @@ export const FETCH_BASKET = gql`
         }
     }
 `
+
+export const LOGIN_USER = gql`
+    query LOGIN_USER($email: String, $password: String) {
+        login(email: $email, password: $password) {
+            email
+            firstName
+            lastName
+            emailVerified
+            token
+        }
+    }
+`

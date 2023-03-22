@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import { AuthChecker, ResolverData } from "type-graphql";
+import { AuthChecker } from "type-graphql";
 import { Context, UserPayload } from "../graphql/context";
 import { client } from "../db";
 import { Account } from "../models";

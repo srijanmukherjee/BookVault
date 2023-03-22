@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import "./App.css";
 import Header from "../components/Header";
 import {
@@ -18,6 +18,7 @@ import Login from "../../features/account/Login";
 import Register from "../../features/account/Register";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { fetchCurrentUser } from "../../features/account/accountSlice";
 
 const THEME_KEY = "theme";
 
@@ -39,6 +40,10 @@ function App() {
 
 	useEffect(() => {
 		dispatch(fetchBasket());
+	}, [dispatch]);
+
+	useLayoutEffect(() => {
+		dispatch(fetchCurrentUser());
 	}, [dispatch]);
 
 	return (
