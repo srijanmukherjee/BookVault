@@ -3,6 +3,7 @@ import { User } from "../../app/models/user";
 import { LoggedInUserSchema } from "../../app/api/schema";
 import { LOCAL_STORAGE_AUTH_KEY, requests } from "../../app/api/agent";
 import { ApolloError } from "@apollo/client";
+import { browserHistory } from "../../main";
 
 interface AccountState {
     token?: string;
@@ -57,7 +58,14 @@ export const fetchCurrentUser = createAsyncThunk<LoggedInUserSchema>(
 export const accountSlice = createSlice({
     name: 'account',
     initialState,
-    reducers: {},
+    reducers: {
+        logout: (state) => {
+            localStorage.removeItem(LOCAL_STORAGE_AUTH_KEY);
+            state.user = undefined;
+            state.status = 'idle';
+            browserHistory.push('/');
+        }
+    },
     extraReducers(builder) {
         builder.addCase(login.pending, (state, action) => {
             state.status = 'loading'
@@ -99,3 +107,5 @@ export const accountSlice = createSlice({
         })
     },
 });
+
+export const { logout } = accountSlice.actions; 

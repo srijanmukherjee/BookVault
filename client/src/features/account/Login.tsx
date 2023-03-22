@@ -13,14 +13,17 @@ import Copyright from "./Copyright";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { Link } from "react-router-dom";
-import { useTheme } from "@mui/material";
+import { Link, useNavigate } from "react-router-dom";
+import { CircularProgress, useTheme } from "@mui/material";
 import AccountTextField from "./AccountTextField";
 import { LoadingButton } from "@mui/lab";
-import { useAppDispatch } from "../../app/store";
+import { useAppDispatch, useAppSelector } from "../../app/store";
 import { login } from "./accountSlice";
 import { toast } from "react-toastify";
 import { useEffect, useLayoutEffect } from "react";
+import { browserHistory } from "../../main";
+import { LOCAL_STORAGE_AUTH_KEY } from "../../app/api/agent";
+import { fetchBasket } from "../basket/basketSlice";
 
 const schema = yup.object({
 	email: yup.string().email().required(),
@@ -32,6 +35,8 @@ const schema = yup.object({
 
 function Login(): JSX.Element {
 	const dispatch = useAppDispatch();
+	const { user } = useAppSelector((store) => store.account);
+	const navigate = useNavigate();
 
 	const {
 		register,
@@ -66,12 +71,23 @@ function Login(): JSX.Element {
 		if (payload && payload instanceof Object && "error" in payload) {
 			handleError(payload.error);
 		} else {
+			dispatch(fetchBasket());
 		}
 	};
 
-	useLayoutEffect(() => {
-		// Do something redirect when already logged in
-	}, []);
+	useEffect(() => {
+		if (user) {
+			navigate("/");
+		}
+	}, [navigate, user]);
+
+	if (localStorage.getItem(LOCAL_STORAGE_AUTH_KEY)) {
+		return (
+			<Box display="grid" minHeight="90vh" sx={{ placeItems: "center" }}>
+				<CircularProgress size="md" />
+			</Box>
+		);
+	}
 
 	return (
 		<Container component="main" maxWidth="xs">

@@ -16,7 +16,7 @@ import { Link, useNavigate } from "react-router-dom";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { useAppSelector } from "../store";
 import { LoadingButton } from "@mui/lab";
-import LoggedInHeaderPart from "./LoggedInHeaderPart";
+import LoggedInMenu from "./LoggedInMenu";
 
 const links = [{ label: "Browse", to: "/catalog" }];
 
@@ -103,7 +103,7 @@ export default function Header({ theme, onThemeToggle }: Props) {
 								</Button>
 							))}
 						</Box>
-						<LoggedInHeaderPart />
+						<LoggedInMenu />
 						<ThemeToggleButton
 							theme={theme}
 							onToggle={onThemeToggle}
