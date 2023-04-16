@@ -56,5 +56,6 @@ export interface LoggedInUserSchema {
         phonenumber?: string;
         emailVerified: boolean
         token: string;
+        basket: Basket;
     }
 }

@@ -8,7 +8,10 @@ function RequireAuth() {
 
 	if (status == "loading") return <Loader />;
 
-	if (!user) return <Navigate to="/login" state={{ from: location }} />;
+	if (!user) {
+		// TODO: should we add 'to' query in the url?
+		return <Navigate to="/account/login" state={{ from: location }} />;
+	}
 
 	return <Outlet />;
 }

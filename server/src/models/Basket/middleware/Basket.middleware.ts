@@ -9,6 +9,8 @@ import Account from "../../Account/Account.model";
 
 export const BASKET_COOKIE = 'basketId'
 
+// TOOD: if user basket is empty and current basket is not, then merge them
+
 const basketInclude = {
     basketItems: {
         include: {

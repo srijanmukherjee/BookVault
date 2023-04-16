@@ -14,7 +14,7 @@ class Basket {
     lastUpdate: Date
 
     @Field(type => Account, { nullable: true })
-    user: Account | null
+    user?: Account | null
 
     @Field(type => String, { nullable: true })
     userEmail: string | null

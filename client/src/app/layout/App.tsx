@@ -1,13 +1,7 @@
 import { useEffect, useLayoutEffect, useState } from "react";
 import "./App.css";
 import Header from "../components/Header";
-import {
-	Box,
-	CssBaseline,
-	ThemeProvider,
-	Typography,
-	createTheme,
-} from "@mui/material";
+import { Box, CssBaseline, ThemeProvider, Typography, createTheme } from "@mui/material";
 import { Route, Routes } from "react-router-dom";
 import Catalog from "../../features/catalog/Catalog";
 import ProductDetail from "../../features/product/ProductDetail";
@@ -19,14 +13,14 @@ import Register from "../../features/account/Register";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { fetchCurrentUser } from "../../features/account/accountSlice";
+import RequireAuth from "../components/RequireAuth";
+import CheckoutWrapper from "../../features/checkout/CheckoutWrapper";
 
 const THEME_KEY = "theme";
 
 function App() {
 	const dispatch = useAppDispatch();
-	const [darkTheme, setDarkTheme] = useState(
-		localStorage.getItem(THEME_KEY) === "dark"
-	);
+	const [darkTheme, setDarkTheme] = useState(localStorage.getItem(THEME_KEY) === "dark");
 
 	const theme = createTheme({
 		palette: {
@@ -49,10 +43,7 @@ function App() {
 	return (
 		<ThemeProvider theme={theme}>
 			<CssBaseline />
-			<Header
-				theme={theme.palette.mode}
-				onThemeToggle={() => setDarkTheme((theme) => !theme)}
-			/>
+			<Header theme={theme.palette.mode} onThemeToggle={() => setDarkTheme((theme) => !theme)} />
 			<Box>
 				<Routes>
 					<Route
@@ -68,6 +59,10 @@ function App() {
 					<Route path="/cart" element={<Basket />} />
 					<Route path="/account/login" element={<Login />} />
 					<Route path="/account/register" element={<Register />} />
+					<Route
+						element={<RequireAuth />}
+						children={[<Route path="/checkout" element={<CheckoutWrapper />} key="checkout" />]}
+					/>
 				</Routes>
 			</Box>
 			<ToastContainer position="bottom-right" theme="colored" />

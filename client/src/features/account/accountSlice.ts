@@ -4,6 +4,7 @@ import { LoggedInUserSchema } from "../../app/api/schema";
 import { LOCAL_STORAGE_AUTH_KEY, requests } from "../../app/api/agent";
 import { ApolloError } from "@apollo/client";
 import { browserHistory } from "../../main";
+import { clearBasket, fetchBasket, setBasket } from "../basket/basketSlice";
 
 interface AccountState {
     token?: string;
@@ -35,6 +36,7 @@ export const login = createAsyncThunk<LoggedInUserSchema, { email?: string, pass
         try {
             const { data, error } = await requests.account.login(email, password);
             if (error) throw error;
+            await thunkAPI.dispatch(setBasket(data.login.basket));
             return data;
         } catch (e: any) {
             return thunkAPI.rejectWithValue({ error: parseServerError(e) });

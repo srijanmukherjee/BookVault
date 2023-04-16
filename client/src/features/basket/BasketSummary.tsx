@@ -1,5 +1,6 @@
 import { Box, Button, List, ListItem, ListItemText, Paper, Typography, useTheme } from "@mui/material";
 import { useAppSelector } from "../../app/store";
+import { Link } from "react-router-dom";
 
 function BasketSummary() {
 	const theme = useTheme();
@@ -56,7 +57,7 @@ function BasketSummary() {
 			<Typography variant="caption" color="text.secondary">
 				<b>Note:</b> Delivery charges are subjected to change depending on your location and courier policies
 			</Typography>
-			<Button variant="contained" fullWidth sx={{ mt: 2 }}>
+			<Button variant="contained" fullWidth sx={{ mt: 2 }} component={Link} to="/checkout">
 				Continue
 			</Button>
 		</Box>

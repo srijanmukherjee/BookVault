@@ -5,6 +5,14 @@ import Basket from "./Basket.model";
 import { BasketInterceptor, BasketLastUpdate } from "./middleware/Basket.middleware";
 import { Context } from "../../graphql/context";
 
+const BASKET_INCLUDE = {
+                    product: {
+                        include: {
+                            book: true
+                        }
+                    }
+};
+
 @Resolver(Basket)
 class BasketResolver {
     @Query((returns) => Basket, { nullable: true })
@@ -45,13 +53,7 @@ class BasketResolver {
                     },
                     quantity
                 },
-                include: {
-                    product: {
-                        include: {
-                            book: true
-                        }
-                    }
-                }
+                include: BASKET_INCLUDE
             });
 
             context.basket!.basketItems = [...context.basket!.basketItems, item];
@@ -81,13 +83,7 @@ class BasketResolver {
                 where: {
                     id: basketItem.id
                 },
-                include: {
-                    product: {
-                        include: {
-                            book: true
-                        }
-                    }
-                }
+                include: BASKET_INCLUDE
             });
 
             const idx = context.basket!.basketItems.findIndex((item) => item.id === basketItem.id);

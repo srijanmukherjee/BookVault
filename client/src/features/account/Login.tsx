@@ -10,8 +10,7 @@ import Copyright from "./Copyright";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { Link, useNavigate } from "react-router-dom";
-import { CircularProgress } from "@mui/material";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import AccountTextField from "./AccountTextField";
 import { LoadingButton } from "@mui/lab";
 import { useAppDispatch, useAppSelector } from "../../app/store";
@@ -20,6 +19,7 @@ import { toast } from "react-toastify";
 import { useEffect } from "react";
 import { LOCAL_STORAGE_AUTH_KEY } from "../../app/api/agent";
 import { fetchBasket } from "../basket/basketSlice";
+import Loader from "../../app/components/Loader";
 
 const schema = yup.object({
 	email: yup.string().email().required(),
@@ -30,6 +30,7 @@ function Login(): JSX.Element {
 	const dispatch = useAppDispatch();
 	const { user } = useAppSelector((store) => store.account);
 	const navigate = useNavigate();
+	const location = useLocation();
 
 	const {
 		register,
@@ -57,24 +58,20 @@ function Login(): JSX.Element {
 
 		if (payload && payload instanceof Object && "error" in payload) {
 			handleError(payload.error);
-		} else {
-			dispatch(fetchBasket());
 		}
 	};
 
 	useEffect(() => {
 		if (user) {
-			navigate("/");
-		}
-	}, [navigate, user]);
+			if (location.state?.from?.pathname === "/checkout") {
+				// TODO: if basket's are not same redirect to basket page
+			}
 
-	if (localStorage.getItem(LOCAL_STORAGE_AUTH_KEY)) {
-		return (
-			<Box display="grid" minHeight="90vh" sx={{ placeItems: "center" }}>
-				<CircularProgress size="md" />
-			</Box>
-		);
-	}
+			navigate(location.state?.from || "/catalog");
+		}
+	}, [navigate, user, location]);
+
+	if (localStorage.getItem(LOCAL_STORAGE_AUTH_KEY)) return <Loader />;
 
 	return (
 		<Container component="main" maxWidth="xs">

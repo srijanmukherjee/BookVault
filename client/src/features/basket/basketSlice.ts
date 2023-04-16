@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import Basket from "../../app/models/basket";
 import { requests } from "../../app/api/agent";
 import { RootState } from "../../app/store";
@@ -63,6 +63,10 @@ export const basketSlice = createSlice({
     reducers: {
         clearBasket: (state) => {
             state.basket = null;
+        },
+
+        setBasket: (state, action: PayloadAction<Basket>) => {
+            state.basket = action.payload
         }
     },
     extraReducers: (builder) => {
@@ -119,4 +123,4 @@ export const basketSlice = createSlice({
     }
 })
 
-export const { clearBasket } = basketSlice.actions;
+export const { clearBasket, setBasket } = basketSlice.actions;

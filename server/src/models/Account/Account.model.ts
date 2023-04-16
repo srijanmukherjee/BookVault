@@ -53,6 +53,9 @@ export class LoggedInAccount {
 
     @Field()
     token?: string;
+
+    @Field(type => Basket)
+    basket: Basket
 }
 
 export default Account;

@@ -10,6 +10,22 @@ import jwt from "jsonwebtoken";
 import { Context } from "../../graphql/context";
 import { getAuthorizedUser } from "../../auth/AuthChecker";
 
+const USER_INCLUDE =  {
+                basket: {
+                    include: {
+                        basketItems: {
+                            include: {
+                                product: {
+                                    include: {
+                                        book: true
+                                    }
+                                }
+                            }
+                        }
+                    }
+		}
+};
+
 @Resolver(of => Account)
 class AccountResolver {
 
@@ -79,6 +95,7 @@ class AccountResolver {
     @Query(returns => LoggedInAccount, { nullable: true, description: "Login" })
     async login(@Arg("email", { nullable: true }) email: string, @Arg("password", { nullable: true }) password: string, @Ctx() context: Context) {
 
+        // already logged in
         if (context.user) {
             const token = context.req.headers.authorization?.split(' ')[1];
             if (token) {
@@ -92,7 +109,9 @@ class AccountResolver {
         const user = await client.user.findUnique({
             where: {
                 email: email!
-            }
+            },
+	    
+            include: USER_INCLUDE
         });
 
         if (!user) throw new ArgumentValidationError(
@@ -142,7 +161,8 @@ class AccountResolver {
             token: token,
             firstName: user.firstName,
             lastName: user.lastName,
-            emailVerified: user.emailVerified
+            emailVerified: user.emailVerified,
+            basket: user.basket
         }
     }
 

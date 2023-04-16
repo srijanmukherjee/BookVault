@@ -131,6 +131,26 @@ export const LOGIN_USER = gql`
             lastName
             emailVerified
             token
+            basket {
+                id,
+                basketItems {
+                    id
+                    product {
+                        id
+                        book {
+                            id
+                            name
+                            format
+                            image
+                        }
+                        price
+                        discount
+                        slug
+                    }
+                    quantity
+                }
+                lastUpdate
+            }
         }
     }
 `
