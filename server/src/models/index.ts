@@ -13,9 +13,11 @@ import Category from "./Category/Category.model";
 import Language from "./Language/Language.model";
 import Product from "./Product/Product.model";
 import { NonEmptyArray } from "type-graphql";
+import Address from "./Address/Address.model";
+import AddressResolver from "./Address/Address.resolver";
 
 const resolvers: NonEmptyArray<Function> = [
-    BasketResolver, ProductResolver, AccountResolver, BookResolver, CategoryResolver, LanguageResolver
+    BasketResolver, ProductResolver, AccountResolver, BookResolver, CategoryResolver, LanguageResolver, AddressResolver
 ]
 
 export {
@@ -26,6 +28,7 @@ export {
     BookResolver,
     CategoryResolver,
     LanguageResolver,
+    AddressResolver,
     resolvers,
     /* Models */
     Account,
@@ -34,5 +37,6 @@ export {
     Book,
     Category,
     Language,
-    Product
+    Product,
+    Address
 };
